@@ -470,9 +470,20 @@ input[type=text].search { min-width: 200px; }
   .toolbar { flex-direction: column; align-items: stretch; }
   .toolbar-left { flex-direction: column; }
   input[type=text].search, select.filter { width: 100%; }
-  .modal { padding: 20px 18px 20px; width: 100%; }
+  .modal { padding: 20px 18px 20px; width: 100%; max-height: 92vh; }
   .modal h2 { margin: -20px -18px 16px; padding: 18px 18px 14px; }
   .field-row { flex-direction: column; gap: 0; }
+  /* Campos com letra >=16px evitam o zoom automático do Safari no iPhone */
+  .field input, .field select, input[type=text].search, select.filter, .group-display { font-size: 16px; padding: 11px 12px; }
+  .btn { padding: 12px 16px; font-size: 14px; }
+  .type-toggle button { padding: 12px 4px; font-size: 12px; }
+  .checkbtn { width: 24px; height: 24px; }
+  .icon-btn { padding: 6px 8px; font-size: 16px; }
+  /* Botão Salvar sempre visível, mesmo rolando um formulário comprido */
+  .modal-actions {
+    position: sticky; bottom: -20px; margin: 20px -18px -20px; padding: 14px 18px;
+    background: var(--paper-card); border-top: 1px solid var(--line);
+  }
 }
 
 @media (max-width: 480px) {
@@ -1251,6 +1262,17 @@ input[type=text].search { min-width: 200px; }
     const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
   }
 
+  // Descrições mais usadas recentemente, pra sugerir no autocompletar (ajuda
+  // bastante a digitar rápido no celular).
+  function recentDescriptions(){
+    const counts = {};
+    [...state.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,300).forEach(t=>{
+      if(!t.desc) return;
+      counts[t.desc] = (counts[t.desc]||0) + 1;
+    });
+    return Object.keys(counts).sort((a,b)=>counts[b]-counts[a]).slice(0,25);
+  }
+
   // ---------- TRANSACTIONS ----------
   function renderTransactions(){
     let list = txForMonth(currentYear, currentMonth);
@@ -1311,7 +1333,7 @@ input[type=text].search { min-width: 200px; }
           <div class="name"><span class="swatch" style="width:14px;height:14px;background:${c.color}"></span>${c.name}</div>
           <div class="figures mono">
             <span style="color:${over?'var(--rust)':'var(--ink)'}">${fmt(spent)}</span> / 
-            <input type="text" class="budget-input" data-cat="${c.id}" value="${limit || ''}" placeholder="0,00">
+            <input type="text" inputmode="decimal" class="budget-input" data-cat="${c.id}" value="${limit || ''}" placeholder="0,00">
           </div>
         </div>
         <div class="budget-track"><div class="budget-fill" style="width:${pct}%; background:${barColor}"></div></div>
@@ -1708,7 +1730,8 @@ input[type=text].search { min-width: 200px; }
         ${!isEdit ? `<div id="f-quickpicks" class="quickpicks"></div>` : ''}
         <div class="field" style="margin-top:16px;">
           <label>Descrição</label>
-          <input type="text" id="f-desc" value="${existing?escapeHtml(existing.desc||''):''}" placeholder="${type==='transfer'?'Ex: Pagamento da fatura':'Ex: Supermercado'}" autocomplete="off">
+          <input type="text" id="f-desc" value="${existing?escapeHtml(existing.desc||''):''}" placeholder="${type==='transfer'?'Ex: Pagamento da fatura':'Ex: Supermercado'}" autocomplete="off" list="f-desc-suggestions" autofocus>
+          <datalist id="f-desc-suggestions">${recentDescriptions().map(d=>`<option value="${escapeHtml(d)}">`).join('')}</datalist>
         </div>
         <div class="field-row">
           <div class="field">
@@ -1764,6 +1787,8 @@ input[type=text].search { min-width: 200px; }
       </div>
     `;
     root.appendChild(overlay);
+    const descInput = document.getElementById('f-desc');
+    if(descInput) setTimeout(()=> descInput.focus(), 50);
     let selType = isExistingCreditCard ? 'creditcard' : type;
 
     // Atalhos rápidos: as últimas combinações usadas (descrição + categoria +
@@ -2004,7 +2029,7 @@ input[type=text].search { min-width: 200px; }
         <h2>${isEdit?'Editar conta a pagar':'Nova conta a pagar'}</h2>
         <div class="field"><label>Descrição</label><input type="text" id="b-desc" value="${isEdit?escapeHtml(existing.desc):''}" placeholder="Ex: Internet"></div>
         <div class="field-row">
-          <div class="field"><label>Valor (R$)</label><input type="text" id="b-amount" value="${isEdit?existing.amount.toFixed(2).replace('.',','):''}" placeholder="0,00"></div>
+          <div class="field"><label>Valor (R$)</label><input type="text" inputmode="decimal" id="b-amount" value="${isEdit?existing.amount.toFixed(2).replace('.',','):''}" placeholder="0,00"></div>
           <div class="field"><label>Vencimento</label><input type="date" id="b-due" value="${isEdit?existing.dueDate:''}"></div>
         </div>
         <div class="field"><label>Categoria</label><select id="b-cat">${catOpts}</select></div>
@@ -2048,7 +2073,7 @@ input[type=text].search { min-width: 200px; }
         <h2>${isEdit?'Editar caixinha':'Nova caixinha'}</h2>
         <div class="card-sub" style="margin-top:-10px;">Dentro de ${escapeHtml(account.name)}</div>
         <div class="field"><label>Nome</label><input type="text" id="cx-name" value="${isEdit?escapeHtml(existing.name):''}" placeholder="Ex: Viagem, Reserva de emergência"></div>
-        <div class="field"><label>Meta (R$, opcional)</label><input type="text" id="cx-goal" value="${isEdit&&existing.goal?existing.goal.toFixed(2).replace('.',','):''}" placeholder="0,00"></div>
+        <div class="field"><label>Meta (R$, opcional)</label><input type="text" inputmode="decimal" id="cx-goal" value="${isEdit&&existing.goal?existing.goal.toFixed(2).replace('.',','):''}" placeholder="0,00"></div>
         <div class="modal-actions">
           <button class="btn btn-ghost" id="cx-cancel">Cancelar</button>
           <button class="btn btn-primary" id="cx-save">Salvar</button>
@@ -2088,7 +2113,7 @@ input[type=text].search { min-width: 200px; }
         </div>
         <div class="field" style="margin-top:16px;">
           <label>Valor (R$)</label>
-          <input type="text" id="cx-amount" placeholder="0,00">
+          <input type="text" inputmode="decimal" id="cx-amount" placeholder="0,00">
         </div>
         <div class="modal-actions">
           <button class="btn btn-ghost" id="cx-cancel">Cancelar</button>
@@ -2138,11 +2163,11 @@ input[type=text].search { min-width: 200px; }
         <div class="field-row">
           <div class="field">
             <label>${isEdit?'Saldo inicial (R$)':'Saldo inicial (R$)'}</label>
-            <input type="text" id="a-balance" value="${isEdit?existing.balance.toFixed(2).replace('.',','):''}" placeholder="0,00">
+            <input type="text" inputmode="decimal" id="a-balance" value="${isEdit?existing.balance.toFixed(2).replace('.',','):''}" placeholder="0,00">
           </div>
           <div class="field">
             <label>Dia de vencimento</label>
-            <input type="text" id="a-dueday" value="${isEdit&&existing.dueDay?existing.dueDay:''}" placeholder="Ex: 10">
+            <input type="text" inputmode="numeric" id="a-dueday" value="${isEdit&&existing.dueDay?existing.dueDay:''}" placeholder="Ex: 10">
           </div>
         </div>
         ${isEdit?`<div class="fab-hint" style="margin-top:-6px;">Saldo atual, com transações: <strong class="mono">${fmt(currentBal)}</strong></div>`:''}
