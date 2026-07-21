@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#3B6E64">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Daily">
+<meta name="format-detection" content="telephone=no">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%233B6E64'/%3E%3Ctext x='50' y='67' font-size='50' font-family='Georgia,serif' font-weight='700' fill='white' text-anchor='middle'%3ED.%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%233B6E64'/%3E%3Ctext x='50' y='67' font-size='50' font-family='Georgia,serif' font-weight='700' fill='white' text-anchor='middle'%3ED.%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Daily%20%E2%80%94%20planner%20do%20casal%22%2C%22short_name%22%3A%22Daily%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23F3F4EF%22%2C%22theme_color%22%3A%22%233B6E64%22%7D">
+<title>Daily — planner do casal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3F4EF;
+    --surface:#FFFFFF;
+    --surface-2:#FBFAF7;
+    --ink:#232B27;
+    --ink-soft:#657167;
+    --ink-faint:#9CA69C;
+    --border:#E1DFD3;
+    --primary:#3B6E64;
+    --primary-dark:#2A4F48;
+    --primary-tint:#E7EEEC;
+    --secondary:#C99A3B;
+    --secondary-tint:#F7EEDC;
+    --urgent:#C0463C;
+    --urgent-tint:#F6E4E2;
+    --today:#DE9A3C;
+    --today-tint:#FBEEDB;
+    --mercado:#3B6E64; --mercado-tint:#E7EEEC;
+    --farmacia:#B25D6B; --farmacia-tint:#F6E9EB;
+    --escolar:#4C5B8A; --escolar-tint:#E9EBF3;
+    --casa:#C99A3B; --casa-tint:#F7EEDC;
+    --outras:#6B7A8F; --outras-tint:#E9ECF0;
+    --radius:16px;
+    --radius-sm:10px;
+    --shadow: 0 2px 14px rgba(35,43,39,0.07), 0 1px 2px rgba(35,43,39,0.06);
+  }
+  html[data-theme="dark"]{
+    --bg:#181D1A;
+    --surface:#212721;
+    --surface-2:#272E28;
+    --ink:#EAEDE8;
+    --ink-soft:#A8B3A6;
+    --ink-faint:#748075;
+    --border:#37403A;
+    --primary:#5B9C8F;
+    --primary-dark:#7FB6A9;
+    --primary-tint:#26332F;
+    --secondary:#E0B563;
+    --secondary-tint:#332C1D;
+    --urgent:#E17F73;
+    --urgent-tint:#3A2523;
+    --today:#E7B667;
+    --today-tint:#382D1B;
+    --mercado:#5B9C8F; --mercado-tint:#22302B;
+    --farmacia:#D48A97; --farmacia-tint:#332428;
+    --escolar:#8B98CB; --escolar-tint:#252A38;
+    --casa:#E0B563; --casa-tint:#332C1D;
+    --outras:#93A3B8; --outras-tint:#262B32;
+    --shadow: 0 2px 14px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.3);
+  }
+  html{ transition:background-color .2s ease; }
+  body, .card, .project-card, nav.tabs, .today-pill{ transition:background-color .2s ease, border-color .2s ease, color .2s ease; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0; overflow-x:hidden; width:100%;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    min-height:100dvh;
+    -webkit-tap-highlight-color:transparent;
+  }
+  h1,h2,h3,.display{ font-family:'Fraunces',serif; letter-spacing:-0.01em; }
+  button{ font-family:inherit; cursor:pointer; touch-action:manipulation; }
+  input,select,textarea{ font-family:inherit; font-size:16px; color:var(--ink); background:var(--surface); }
+  :focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
+  a{ color:var(--primary-dark); }
+
+  #app{ max-width:920px; margin:0 auto; padding:0 16px calc(24px + env(safe-area-inset-bottom)); }
+
+  .topbar{
+    padding:max(22px, calc(14px + env(safe-area-inset-top))) 4px 14px;
+    display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+    flex-wrap:wrap;
+  }
+  .brand{ display:flex; align-items:baseline; gap:10px; }
+  .brand .mark{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:34px; height:34px; border-radius:9px;
+    background:var(--primary); color:#fff; font-family:'Fraunces',serif; font-weight:600; font-size:17px;
+    transform:rotate(-4deg);
+  }
+  .brand h1{ font-size:24px; margin:0; font-weight:700; color:var(--ink); }
+  .brand .tag{ font-size:12.5px; color:var(--ink-faint); }
+  .today-pill{
+    font-size:12.5px; color:var(--ink-soft); background:var(--surface);
+    border:1px solid var(--border); padding:6px 12px; border-radius:999px;
+  }
+
+  nav.tabs{
+    display:flex; gap:6px; overflow-x:auto; padding:4px 2px 14px;
+    scrollbar-width:none;
+  }
+  nav.tabs::-webkit-scrollbar{ display:none; }
+  nav.tabs button{
+    flex:0 0 auto; display:flex; align-items:center; gap:6px;
+    background:var(--surface); border:1px solid var(--border); color:var(--ink-soft);
+    padding:9px 14px; border-radius:999px; font-size:13.5px; font-weight:600;
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  nav.tabs button svg{ width:15px; height:15px; }
+  nav.tabs button.active{ background:var(--primary); border-color:var(--primary); color:#fff; }
+  nav.tabs button:not(.active):hover{ border-color:var(--primary); color:var(--primary-dark); }
+
+  .row-item{ min-height:44px; }
+  .icon-btn{ min-width:32px; min-height:32px; }
+  .item-name{ min-width:0; overflow-wrap:anywhere; }
+
+  @media (max-width:640px){
+    .card{ padding:15px; }
+    .topbar{ padding-left:2px; padding-right:2px; }
+    .brand h1{ font-size:21px; }
+
+    nav.tabs{
+      position:fixed; left:0; right:0; bottom:0; z-index:50;
+      margin:0; padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+      background:var(--surface); border-top:1px solid var(--border);
+      justify-content:space-between; gap:2px; box-shadow:0 -2px 10px rgba(35,43,39,0.06);
+    }
+    nav.tabs button{
+      flex-direction:column; gap:3px; flex:1; min-width:0; padding:7px 2px;
+      border:none; background:none; border-radius:10px; font-size:10.2px; font-weight:600;
+    }
+    nav.tabs button svg{ width:20px; height:20px; }
+    nav.tabs button.active{ background:var(--primary-tint); color:var(--primary-dark); }
+    nav.tabs button:not(.active):hover{ border-color:transparent; }
+    nav.tabs .tab-label{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+
+    #app{ padding-bottom:calc(78px + env(safe-area-inset-bottom)); }
+    .grid{ gap:12px; }
+    .proj-grid{ gap:12px; }
+  }
+
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:18px;
+  }
+  .section-title{
+    font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-faint);
+    font-weight:700; margin:0 0 10px;
+  }
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:640px){ .grid{ grid-template-columns:1fr; } }
+  .stack{ display:flex; flex-direction:column; gap:14px; }
+
+  .alert{
+    display:flex; align-items:flex-start; gap:10px;
+    background:var(--today-tint); border:1px solid #EED7AC; color:#7A5417;
+    padding:12px 14px; border-radius:var(--radius-sm); font-size:13.5px; margin-bottom:10px;
+  }
+  .alert button.link{ background:none;border:none;color:#7A5417; font-weight:700; text-decoration:underline; padding:0; font-size:13.5px;}
+  .alert .x{ margin-left:auto; background:none;border:none;color:#7A5417; font-size:16px; line-height:1; padding:0 2px;}
+
+  .empty{ color:var(--ink-faint); font-size:13.5px; padding:10px 2px; }
+
+  .row-item{
+    display:flex; align-items:center; gap:10px; padding:9px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .row-item:last-child{ border-bottom:none; }
+  .chk{
+    width:19px; height:19px; border-radius:6px; border:1.6px solid var(--ink-faint);
+    display:flex; align-items:center; justify-content:center; flex:0 0 auto; background:var(--surface);
+  }
+  .chk.done{ background:var(--primary); border-color:var(--primary); color:#fff; font-size:12px; }
+  .item-name{ flex:1; font-size:14px; }
+  .item-name.done{ text-decoration:line-through; color:var(--ink-faint); }
+  .badge{
+    font-size:11px; font-weight:700; padding:3px 8px; border-radius:999px; white-space:nowrap;
+  }
+  .badge.urgente{ background:var(--urgent-tint); color:var(--urgent); }
+  .badge.hoje{ background:var(--today-tint); color:#946018; }
+  .badge.quando_puder{ background:var(--primary-tint); color:var(--primary-dark); }
+  .badge.status{ background:var(--secondary-tint); color:#8A6A22; }
+  .icon-btn{
+    background:none; border:none; color:var(--ink-faint); font-size:15px; padding:4px 6px; border-radius:6px;
+  }
+  .icon-btn:hover{ background:var(--bg); color:var(--ink); }
+
+  .btn{
+    background:var(--primary); color:#fff; border:none; padding:9px 16px; border-radius:999px;
+    font-weight:600; font-size:13.5px;
+  }
+  .btn:hover{ background:var(--primary-dark); }
+  .btn.secondary{ background:var(--surface); color:var(--primary-dark); border:1.4px solid var(--primary); }
+  .btn.small{ padding:6px 12px; font-size:12.5px; }
+  .btn.ghost{ background:none; border:1px solid var(--border); color:var(--ink-soft); }
+  .btn.danger{ background:var(--urgent); }
+
+  form.inline{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  form.inline input, form.inline select{
+    padding:9px 11px; border-radius:var(--radius-sm); border:1.4px solid var(--border); background:var(--surface);
+  }
+  .field{ display:flex; flex-direction:column; gap:4px; }
+  .field label{ font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .field input, .field select, .field textarea{
+    padding:9px 11px; border-radius:var(--radius-sm); border:1.4px solid var(--border); background:var(--surface); width:100%;
+  }
+  .form-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:12px; }
+  @media (max-width:640px){ .form-grid{ grid-template-columns:1fr; } }
+
+  .subtabs{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+  .subtabs button{
+    background:var(--surface-2); border:1px solid var(--border); color:var(--ink-soft);
+    padding:7px 13px; border-radius:999px; font-size:13px; font-weight:600;
+  }
+  .subtabs button.active{ color:#fff; border-color:transparent; }
+
+  .dot{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+
+  .project-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:8px; text-align:left;
+  }
+  .progress-bar{ height:7px; background:var(--bg); border-radius:99px; overflow:hidden; }
+  .progress-bar > div{ height:100%; background:var(--primary); }
+  .proj-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+  @media (max-width:760px){ .proj-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:480px){ .proj-grid{ grid-template-columns:1fr; } }
+
+  .timeline{ position:relative; padding-left:26px; }
+  .timeline::before{ content:''; position:absolute; left:8px; top:4px; bottom:4px; width:2px; background:var(--border); }
+  .tl-item{ position:relative; padding:0 0 18px; }
+  .tl-item:last-child{ padding-bottom:0; }
+  .tl-dot{
+    position:absolute; left:-26px; top:2px; width:17px; height:17px; border-radius:50%;
+    background:var(--surface); border:2.5px solid var(--secondary); display:flex; align-items:center; justify-content:center; font-size:9px;
+  }
+  .tl-item.done .tl-dot{ background:var(--primary); border-color:var(--primary); color:#fff; }
+  .tl-item.overdue .tl-dot{ border-color:var(--urgent); }
+  .tl-date{ font-size:11.5px; color:var(--ink-faint); font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
+  .tl-label{ font-size:14px; margin-top:1px; }
+  .name-input{
+    font-family:'Fraunces',serif; font-size:22px; font-weight:700; border:none; background:none; color:var(--ink);
+    padding:2px 4px; border-radius:8px; min-width:120px; flex:1;
+  }
+  .name-input:hover, .name-input:focus{ background:var(--surface-2); outline:1.4px solid var(--border); }
+  .goal-box{
+    display:flex; flex-direction:column; gap:4px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:var(--radius-sm); padding:10px 12px; flex:1; min-width:150px;
+  }
+  .goal-box label{ font-size:11.5px; color:var(--ink-faint); font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
+  .goal-box input{ border:none; background:none; padding:2px 0; font-size:15px; font-weight:600; }
+
+  .back-link{ background:none; border:none; color:var(--ink-soft); font-size:13.5px; margin-bottom:10px; padding:0; font-weight:600; }
+  .pill-select{ display:flex; gap:6px; flex-wrap:wrap; }
+  .pill-select button{ padding:6px 12px; border-radius:999px; border:1.4px solid var(--border); background:var(--surface); font-size:12.5px; font-weight:600; color:var(--ink-soft); }
+  .pill-select button.sel{ color:#fff; border-color:transparent; }
+
+  textarea{ min-height:90px; resize:vertical; }
+  .divider{ height:1px; background:var(--border); margin:14px 0; }
+  .contact-role{ font-size:12px; color:var(--ink-faint); }
+  .fav-star{ color:var(--secondary); }
+
+  .loading{ text-align:center; padding:60px 10px; color:var(--ink-faint); font-size:14px; }
+
+  .lock-screen{
+    min-height:100vh; min-height:100dvh; display:flex; align-items:center; justify-content:center;
+    padding:24px;
+  }
+  .lock-card{
+    width:100%; max-width:360px; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); box-shadow:var(--shadow); padding:32px 28px; text-align:center;
+  }
+  .lock-card .mark{
+    display:inline-flex; align-items:center; justify-content:center; width:52px; height:52px;
+    border-radius:14px; background:var(--primary); color:#fff; font-family:'Fraunces',serif;
+    font-weight:600; font-size:24px; margin-bottom:14px; transform:rotate(-4deg);
+  }
+  .lock-card h2{ margin:0 0 4px; font-size:20px; }
+  .lock-card p{ color:var(--ink-soft); font-size:13.5px; margin:0 0 20px; }
+  .lock-card input{
+    width:100%; padding:11px 13px; border-radius:var(--radius-sm); border:1.4px solid var(--border);
+    margin-bottom:10px; text-align:center; letter-spacing:1px;
+  }
+  .lock-card .btn{ width:100%; padding:11px; margin-top:4px; }
+  .lock-error{ color:var(--urgent); font-size:12.5px; margin:-2px 0 10px; }
+</style>
+</head>
+<body>
+<div id="app"><div class="loading">Carregando o Daily…</div></div>
+
+<script>
+const ICONS = {
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>',
+  cart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2 3h2l2.6 12.4a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 7H6"/></svg>',
+  cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>',
+  note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v14l-4 4H4z"/><path d="M8 9h8M8 13h5"/></svg>',
+  house: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M9 21V12h6v9"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.4 2.1L8 10.3a16 16 0 0 0 6 6l1.5-1.4a2 2 0 0 1 2.1-.4c1 .3 2 .5 3 .7a2 2 0 0 1 1.4 2.1z"/></svg>',
+  folder: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+};
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const todayISO = () => new Date().toISOString().slice(0,10);
+function fmtDate(iso){
+  const d = new Date(iso+'T00:00:00');
+  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'short'});
+}
+function fmtDateFull(iso){
+  const d = new Date(iso+'T00:00:00');
+  return d.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
+}
+function escapeHtml(s){
+  return (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtBRL(n){
+  return (n||0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+}
+function daysDiff(dateA, dateB){
+  const a = new Date(dateA); a.setHours(0,0,0,0);
+  const b = new Date(dateB); b.setHours(0,0,0,0);
+  return Math.round((a-b)/86400000);
+}
+function nextOccurrence(ev){
+  const base = new Date(ev.date+'T00:00:00');
+  const now = new Date(); now.setHours(0,0,0,0);
+  let d = new Date(base);
+  if(!ev.recurring || ev.recurring==='none') return d;
+  if(ev.recurring==='yearly'){
+    d.setFullYear(now.getFullYear());
+    if(d<now) d.setFullYear(now.getFullYear()+1);
+  } else if(ev.recurring==='monthly'){
+    d = new Date(now.getFullYear(), now.getMonth(), base.getDate());
+    if(d<now) d.setMonth(d.getMonth()+1);
+  } else if(ev.recurring==='weekly'){
+    while(d<now) d.setDate(d.getDate()+7);
+  }
+  return d;
+}
+
+const LIST_META = {
+  mercado:{label:'Mercado', color:'var(--mercado)', tint:'var(--mercado-tint)'},
+  farmacia:{label:'Farmácia', color:'var(--farmacia)', tint:'var(--farmacia-tint)'},
+  escolar:{label:'Material escolar', color:'var(--escolar)', tint:'var(--escolar-tint)'},
+  casa:{label:'Casa', color:'var(--casa)', tint:'var(--casa-tint)'},
+  outras:{label:'Outras', color:'var(--outras)', tint:'var(--outras-tint)'},
+};
+const EVENT_TYPES = {
+  aniversario:{label:'Aniversário', icon:'🎂'}, conta:{label:'Conta a vencer', icon:'💳'},
+  consulta:{label:'Consulta médica', icon:'🩺'}, vacina:{label:'Vacina', icon:'💉'},
+  evento:{label:'Evento', icon:'✨'}, trabalho:{label:'Trabalho presencial', icon:'💼'},
+  crianca:{label:'Evento da criança', icon:'🧒'}, viagem:{label:'Viagem', icon:'✈️'},
+  lembrete:{label:'Lembrete', icon:'⏰'},
+};
+const TASK_CATS = {
+  limpeza:'Limpeza', manutencao:'Manutenção', organizacao:'Organização',
+  filtros:'Troca de filtros', documentos:'Vencimento de documentos',
+};
+const CONTACT_ROLES = ['Pediatra','Escola','Condomínio','Portaria','Trabalho','Outro'];
+
+// Catálogo padrão de estoque — família com 2 adultos e 1 criança de 4 anos
+const DEFAULT_STOCK = {
+  mercado: [
+    'Arroz','Feijão','Macarrão','Farinha de trigo','Farinha de mandioca','Aveia','Açúcar','Sal',
+    'Óleo de cozinha','Azeite de oliva','Ovos','Frango','Carne bovina','Peixe','Linguiça',
+    'Leite','Leite de crescimento infantil','Iogurte','Queijo','Manteiga','Requeijão',
+    'Pão de forma','Pão francês','Torradas','Biscoito/bolacha','Biscoito infantil',
+    'Banana','Maçã','Laranja','Tomate','Cebola','Alho','Batata','Alface','Cenoura',
+    'Café','Achocolatado','Suco','Água mineral','Molho de tomate','Vinagre','Temperos variados',
+    'Petit suisse/papinha','Suco de caixinha infantil',
+  ],
+  farmacia: [
+    'Paracetamol/analgésico','Antitérmico infantil (gotas)','Anti-inflamatório','Antialérgico',
+    'Soro fisiológico','Soro de reidratação oral','Curativos/band-aid','Gaze','Álcool 70%',
+    'Pomada para assaduras','Termômetro','Repelente infantil','Escova de dente','Pasta de dente',
+    'Fio dental','Desodorante','Shampoo','Condicionador','Sabonete','Absorvente feminino',
+    'Lâmina de barbear','Escova de dente infantil','Pasta de dente infantil','Shampoo infantil',
+    'Protetor solar infantil','Lenço umedecido','Vitamina C','Polivitamínico infantil',
+  ],
+  escolar: [
+    'Mochila','Lancheira','Caderno de desenho','Lápis de cor','Giz de cera','Lápis grafite',
+    'Borracha','Apontador','Cola bastão','Tesoura sem ponta','Massinha de modelar','Estojo',
+    'Squeeze/garrafinha de água','Avental para pintura','Livro de colorir','Agenda escolar',
+    'Uniforme escolar','Tênis para educação física',
+  ],
+  casa: [
+    'Detergente','Sabão em pó','Amaciante','Água sanitária','Desinfetante','Multiuso',
+    'Esponja de limpeza','Pano de chão','Papel toalha','Papel higiênico','Sacos de lixo',
+    'Álcool em gel','Limpa vidro','Pilhas AA/AAA','Lâmpadas','Filtro de água','Fósforos',
+    'Gás de cozinha (botijão)','Velas','Guardanapos','Papel alumínio/filme plástico','Sacos para freezer',
+  ],
+  outras: [
+    'Presente','Decoração','Ferramenta','Item avulso','Bateria',
+  ],
+};
+const PROJECT_STATUS = {ideia:'Ideia', planejamento:'Planejamento', andamento:'Em andamento', pausado:'Pausado', concluido:'Concluído'};
+const PROJECT_PRIORITY = {alta:'Alta', media:'Média', baixa:'Baixa'};
+
+const DEFAULTS = {
+  shopping: { lists:{mercado:[],farmacia:[],escolar:[],casa:[],outras:[]}, favorites:[], history:[], stock:{}, prices:{} },
+  agenda: { events:[] },
+  messages: { messages:[] },
+  home: { tasks:[] },
+  contacts: { contacts:[] },
+  projects: { projects:[] },
+};
+
+const now0 = new Date();
+let state = {
+  view:'inicio',
+  shopSubtab:'mercado',
+  currentProject:null,
+  dismissedAlerts:{},
+  data: null,
+  theme:'light',
+  agendaView:'calendario',
+  calYear: now0.getFullYear(),
+  calMonth: now0.getMonth(),
+  selectedDate: todayISO(),
+  projCalYear: now0.getFullYear(),
+  projCalMonth: now0.getMonth(),
+  weather: null,
+  syncStatus: null,
+  currentUser: null,
+  currentEmail: null,
+};
+
+// ---------- PERSISTÊNCIA (Google Sheets via Apps Script) ----------
+const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbx3Un4MF7we918-Vf4jVFIRDTyqBfuQyTf_3CzaY3UL6jtD7zFf8etfckgwoiOm19tXxg/exec';
+
+async function sheetsGet(key, shared){
+  const url = `${SHEETS_API_URL}?key=${encodeURIComponent(key)}&shared=${shared}`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('sheets get http '+res.status);
+  return res.json(); // null ou {key, shared, value}
+}
+async function sheetsSet(key, value, shared){
+  const res = await fetch(SHEETS_API_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'}, // evita preflight CORS no Apps Script
+    body: JSON.stringify({action:'set', key, value, shared})
+  });
+  if(!res.ok) throw new Error('sheets set http '+res.status);
+  return res.json();
+}
+
+// ---------- LOGIN (perfil individual por e-mail) ----------
+async function sha256Hex(text){
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function isValidEmail(str){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
+}
+function profileLabel(u){
+  return u.name && u.name.trim() ? u.name : u.email;
+}
+async function bootAuth(){
+  try{
+    const local = await window.storage.get('daily:device-auth', false);
+    if(local && local.value==='true'){
+      try{
+        const du = await window.storage.get('daily:device-user', false);
+        if(du){
+          const parsed = JSON.parse(du.value);
+          state.currentUser = parsed.name || parsed.email;
+          state.currentEmail = parsed.email;
+        }
+      }catch(e){}
+      init();
+      return;
+    }
+  }catch(e){}
+
+  renderLock({status:'loading'});
+  let stored = null;
+  try{
+    const res = await sheetsGet('daily:auth', true);
+    stored = (res && res.value) ? JSON.parse(res.value) : null;
+    window.storage.set('daily:auth-cache', res && res.value ? res.value : '', true).catch(()=>{});
+  }catch(e){
+    try{
+      const cached = await window.storage.get('daily:auth-cache', true);
+      stored = (cached && cached.value) ? JSON.parse(cached.value) : null;
+    }catch(e2){}
+  }
+  const users = (stored && stored.users) ? stored.users : [];
+  if(!users.length){
+    renderLock({status:'create', users, isFirst:true});
+  } else {
+    renderLock({status:'select', users});
+  }
+}
+async function saveAuthUsers(users){
+  const value = JSON.stringify({users});
+  try{ await sheetsSet('daily:auth', value, true); }catch(err){}
+  window.storage.set('daily:auth-cache', value, true).catch(()=>{});
+}
+function renderLock(authState){
+  const app = document.getElementById('app');
+  let body = '';
+  if(authState.status==='loading'){
+    body = `<div class="loading">Verificando acesso…</div>`;
+  } else if(authState.status==='select'){
+    body = `
+      <p>Quem é você?</p>
+      <div class="profile-list">
+        ${authState.users.map(u=>`<button class="btn secondary" style="width:100%;margin-bottom:8px;text-align:left" data-select-user="${escapeHtml(u.email)}">
+          <div style="font-weight:700">${escapeHtml(profileLabel(u))}</div>
+          ${u.name? `<div style="font-size:11.5px;opacity:.7;font-weight:500">${escapeHtml(u.email)}</div>` : ''}
+        </button>`).join('')}
+      </div>
+      <button class="btn ghost small" data-new-profile style="margin-top:6px;width:100%">+ Criar meu perfil</button>
+    `;
+  } else if(authState.status==='password'){
+    const user = authState.users.find(u=>u.email===authState.email);
+    body = `
+      <button type="button" class="back-link" data-back-select>← Voltar</button>
+      <p>Olá, <b>${escapeHtml(user? profileLabel(user) : authState.email)}</b>. Digite sua senha para entrar.</p>
+      <form id="lock-form">
+        <input type="password" id="lock-pw1" placeholder="Sua senha" autocomplete="current-password" required>
+        <div id="lock-error" class="lock-error"></div>
+        <button class="btn" type="submit">Entrar</button>
+      </form>
+    `;
+  } else if(authState.status==='create'){
+    body = `
+      ${!authState.isFirst? `<button type="button" class="back-link" data-back-select>← Voltar</button>` : ''}
+      <p>${authState.isFirst? 'Este é o primeiro acesso ao Daily. Crie seu perfil pessoal com seu e-mail.' : 'Crie seu perfil pessoal para entrar no Daily.'}</p>
+      <form id="lock-form">
+        <input type="email" id="lock-email" placeholder="Seu e-mail" autocomplete="email" required>
+        <input type="text" id="lock-name" placeholder="Como quer ser chamado (opcional)" autocomplete="name" maxlength="24">
+        <input type="password" id="lock-pw1" placeholder="Criar senha" autocomplete="new-password" required minlength="4">
+        <input type="password" id="lock-pw2" placeholder="Confirmar senha" autocomplete="new-password" required minlength="4">
+        <div id="lock-error" class="lock-error"></div>
+        <button class="btn" type="submit">Criar perfil e entrar</button>
+      </form>
+    `;
+  }
+  app.innerHTML = `
+    <div class="lock-screen">
+      <div class="lock-card">
+        <span class="mark">D.</span>
+        <h2>Daily</h2>
+        ${body}
+      </div>
+    </div>
+  `;
+  if(authState.status==='select'){
+    document.querySelectorAll('[data-select-user]').forEach(b=>b.addEventListener('click', ()=>{
+      renderLock({status:'password', email:b.dataset.selectUser, users:authState.users});
+    }));
+    const newBtn = document.querySelector('[data-new-profile]');
+    if(newBtn) newBtn.addEventListener('click', ()=> renderLock({status:'create', users:authState.users, isFirst:false}));
+    return;
+  }
+  const backBtn = document.querySelector('[data-back-select]');
+  if(backBtn) backBtn.addEventListener('click', ()=> renderLock({status:'select', users:authState.users}));
+
+  const form = document.getElementById('lock-form');
+  if(!form) return;
+  form.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const errorEl = document.getElementById('lock-error');
+    const pw1 = document.getElementById('lock-pw1').value;
+
+    if(authState.status==='create'){
+      const email = document.getElementById('lock-email').value.trim().toLowerCase();
+      const name = document.getElementById('lock-name').value.trim();
+      const pw2 = document.getElementById('lock-pw2').value;
+      if(!isValidEmail(email)){ errorEl.textContent = 'Digite um e-mail válido.'; return; }
+      if(authState.users.some(u=>u.email.toLowerCase()===email)){ errorEl.textContent = 'Já existe um perfil com esse e-mail.'; return; }
+      if(pw1 !== pw2){ errorEl.textContent = 'As senhas não coincidem.'; return; }
+      const hash = await sha256Hex(pw1);
+      const users = [...authState.users, {email, name, hash}];
+      await saveAuthUsers(users);
+      window.storage.set('daily:device-auth', 'true', false).catch(()=>{});
+      window.storage.set('daily:device-user', JSON.stringify({email, name}), false).catch(()=>{});
+      state.currentUser = name || email;
+      state.currentEmail = email;
+      init();
+    } else if(authState.status==='password'){
+      const hash = await sha256Hex(pw1);
+      const user = authState.users.find(u=>u.email===authState.email);
+      if(user && hash === user.hash){
+        window.storage.set('daily:device-auth', 'true', false).catch(()=>{});
+        window.storage.set('daily:device-user', JSON.stringify({email:user.email, name:user.name}), false).catch(()=>{});
+        state.currentUser = user.name || user.email;
+        state.currentEmail = user.email;
+        init();
+      } else {
+        errorEl.textContent = 'Senha incorreta. Tente de novo.';
+      }
+    }
+  });
+}
+function logout(){
+  window.storage.delete('daily:device-auth', false).catch(()=>{});
+  window.storage.delete('daily:device-user', false).catch(()=>{});
+  location.reload();
+}
+
+async function loadKey(key){
+  const storageKey = 'daily:'+key;
+  try{
+    const res = await sheetsGet(storageKey, true);
+    if(res && res.value!=null){
+      // guarda uma cópia local como cache de segurança
+      window.storage.set(storageKey, res.value, true).catch(()=>{});
+      state.syncStatus = 'ok';
+      return JSON.parse(res.value);
+    }
+  }catch(e){
+    console.warn('Sheets indisponível, usando cache local para', key, e);
+    state.syncStatus = 'error';
+  }
+  // fallback: cache local (window.storage) ou valor padrão
+  try{
+    const cached = await window.storage.get(storageKey, true);
+    if(cached) return JSON.parse(cached.value);
+  }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULTS[key]));
+}
+async function saveKey(key){
+  const storageKey = 'daily:'+key;
+  const value = JSON.stringify(state.data[key]);
+  window.storage.set(storageKey, value, true).catch(()=>{}); // cache local, best-effort
+  try{
+    await sheetsSet(storageKey, value, true);
+    state.syncStatus = 'ok';
+  }catch(e){
+    console.error('erro ao salvar no Google Sheets', key, e);
+    state.syncStatus = 'error';
+  }
+}
+async function loadTheme(){
+  try{
+    const res = await sheetsGet('daily:theme', false);
+    if(res && res.value!=null) return JSON.parse(res.value);
+  }catch(e){}
+  try{
+    const cached = await window.storage.get('daily:theme', false);
+    if(cached) return JSON.parse(cached.value);
+  }catch(e){}
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+async function toggleTheme(){
+  state.theme = state.theme==='dark' ? 'light' : 'dark';
+  applyTheme();
+  const val = JSON.stringify(state.theme);
+  window.storage.set('daily:theme', val, false).catch(()=>{});
+  try{ await sheetsSet('daily:theme', val, false); }catch(e){}
+  render();
+}
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', state.theme);
+}
+async function init(){
+  const [shopping, agenda, messages, home, contacts, projects, theme] = await Promise.all([
+    loadKey('shopping'), loadKey('agenda'), loadKey('messages'), loadKey('home'),
+    loadKey('contacts'), loadKey('projects'), loadTheme()
+  ]);
+  state.data = {shopping, agenda, messages, home, contacts, projects};
+  if(!state.data.shopping.prices) state.data.shopping.prices = {};
+  state.theme = theme;
+  applyTheme();
+  migrateStock();
+  migrateProjects();
+  await seedDefaultStock();
+  render();
+  fetchWeather();
+}
+const BARUERI_LAT = -23.5106;
+const BARUERI_LON = -46.8761;
+async function fetchWeather(){
+  state.weather = {status:'loading'};
+  try{
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${BARUERI_LAT}&longitude=${BARUERI_LON}&current=temperature_2m,weather_code&timezone=America%2FSao_Paulo`);
+    if(!res.ok) throw new Error('http '+res.status);
+    const wx = await res.json();
+    state.weather = {
+      status:'ok',
+      temp: Math.round(wx.current.temperature_2m),
+      code: wx.current.weather_code,
+      city: 'Barueri, SP'
+    };
+  }catch(e){
+    state.weather = {status:'error'};
+  }
+  render();
+}
+function weatherIcon(code){
+  if(code===0) return '☀️';
+  if([1,2,3].includes(code)) return '⛅';
+  if([45,48].includes(code)) return '🌫️';
+  if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return '🌧️';
+  if([71,73,75,77,85,86].includes(code)) return '❄️';
+  if([95,96,99].includes(code)) return '⛈️';
+  return '🌡️';
+}
+function renderWeatherInline(){
+  const w = state.weather;
+  if(!w || w.status==='loading') return `<span style="opacity:.6">· carregando clima…</span>`;
+  if(w.status==='error') return `<button data-retry-weather style="background:none;border:none;color:var(--ink-faint);font-size:12px;padding:0;text-decoration:underline">· tentar clima novamente</button>`;
+  return `<span>· ${weatherIcon(w.code)} ${w.temp}°C · ${escapeHtml(w.city)}</span>`;
+}
+function migrateStock(){
+  if(!state.data.shopping.lists.outras) state.data.shopping.lists.outras = [];
+  const stock = state.data.shopping.stock;
+  Object.keys(stock).forEach(name=>{
+    if(typeof stock[name] === 'string'){
+      stock[name] = {status:stock[name], category:'mercado'};
+    }
+  });
+}
+function migrateProjects(){
+  state.data.projects.projects.forEach(p=>{
+    if(p.budgetGoal===undefined) p.budgetGoal = null;
+    if(p.deadlineGoal===undefined) p.deadlineGoal = null;
+    p.checklist.forEach(c=>{
+      if(c.value===undefined) c.value = null;
+      if(c.endDate===undefined) c.endDate = c.date || null;
+      if(c.startDate===undefined) c.startDate = null;
+    });
+  });
+}
+async function seedDefaultStock(){
+  if(state.data.shopping.stockSeeded) return;
+  const stock = state.data.shopping.stock;
+  Object.entries(DEFAULT_STOCK).forEach(([category, names])=>{
+    names.forEach(name=>{
+      if(!stock[name]) stock[name] = {status:'tem', category};
+    });
+  });
+  state.data.shopping.stockSeeded = true;
+  await saveKey('shopping');
+}
+
+function setView(v){ state.view = v; state.currentProject = null; render(); }
+
+// ---------- SMART ALERTS ----------
+function computeAlerts(){
+  const alerts = [];
+  const d = state.data;
+  // stock acabou
+  Object.entries(d.shopping.stock||{}).forEach(([name, entry])=>{
+    if(entry.status==='acabou'){
+      const key = 'stock:'+name;
+      if(state.dismissedAlerts[key]) return;
+      const already = Object.values(d.shopping.lists).flat().some(i=>i.name.toLowerCase()===name.toLowerCase() && !i.comprado);
+      if(!already){
+        alerts.push({key, type:'stock', text:`${name} acabou na última compra. Deseja adicionar à lista?`, itemName:name, category:entry.category||'mercado'});
+      }
+    }
+  });
+  // agenda tomorrow / today
+  d.agenda.events.forEach(ev=>{
+    const occ = nextOccurrence(ev);
+    const diff = daysDiff(occ, new Date());
+    const key = 'ev:'+ev.id+':'+occ.toDateString();
+    if(state.dismissedAlerts[key]) return;
+    if(diff===0){
+      alerts.push({key, type:'info', text:`${EVENT_TYPES[ev.type]?.icon||''} ${ev.title} é hoje${ev.time? ' às '+ev.time:''}.`});
+    } else if(diff===1){
+      alerts.push({key, type:'info', text:`${EVENT_TYPES[ev.type]?.icon||''} ${ev.title} é amanhã${ev.time? ' às '+ev.time:''}.`});
+    }
+  });
+  // overdue home tasks
+  const overdue = d.home.tasks.filter(t=>!t.done && t.dueDate && daysDiff(t.dueDate, new Date())<0);
+  if(overdue.length && !state.dismissedAlerts['overdue']){
+    alerts.push({key:'overdue', type:'info', text:`Você tem ${overdue.length} tarefa(s) da casa atrasada(s).`});
+  }
+  return alerts;
+}
+function dismissAlert(key){ state.dismissedAlerts[key]=true; render(); }
+async function addStockToList(name, category){
+  const list = LIST_META[category] ? category : 'mercado';
+  state.data.shopping.lists[list].push({id:uid(), name, qty:1, comprado:false});
+  await saveKey('shopping');
+  state.dismissedAlerts['stock:'+name]=true;
+  render();
+}
+
+// ---------- RENDER ----------
+function render(){
+  const app = document.getElementById('app');
+  const tabs = [
+    ['inicio','Início','home'], ['compras','Compras','cart'], ['agenda','Agenda','cal'],
+    ['recados','Recados','note'], ['casa','Casa','house'], ['contatos','Contatos','phone'], ['projetos','Projetos','folder']
+  ];
+  app.innerHTML = `
+    <div class="topbar">
+      <div class="brand">
+        <span class="mark">D.</span>
+        <div><h1>Daily</h1><div class="tag">${state.currentUser? `Olá, ${escapeHtml(state.currentUser)}` : 'o planner do casal'}</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="today-pill" style="display:flex;align-items:center;gap:8px">
+          <span>${fmtDateFull(todayISO())}</span>
+          ${renderWeatherInline()}
+        </div>
+        ${state.syncStatus==='error' ? `<span title="Não foi possível sincronizar com o Google Sheets agora — usando cópia local. Vai tentar de novo na próxima alteração." style="font-size:15px;opacity:.75">⚠️☁️</span>` : ''}
+        <button id="theme-toggle" class="icon-btn" style="border:1px solid var(--border);border-radius:999px;min-width:38px;min-height:38px;background:var(--surface);font-size:16px" title="Alternar modo dia/noite" aria-label="Alternar modo dia/noite">${state.theme==='dark'?'☀️':'🌙'}</button>
+        <button id="logout-btn" class="icon-btn" style="border:1px solid var(--border);border-radius:999px;min-width:38px;min-height:38px;background:var(--surface);font-size:15px" title="Sair" aria-label="Sair">🔒</button>
+      </div>
+    </div>
+    <nav class="tabs">
+      ${tabs.map(([id,label,icon])=>`
+        <button class="${state.view===id?'active':''}" data-nav="${id}">${ICONS[icon]}<span class="tab-label">${label}</span></button>
+      `).join('')}
+    </nav>
+    <div id="view-root"></div>
+  `;
+  document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click', ()=>setView(b.dataset.nav)));
+  const themeBtn = document.getElementById('theme-toggle');
+  if(themeBtn) themeBtn.addEventListener('click', toggleTheme);
+  const logoutBtn = document.getElementById('logout-btn');
+  if(logoutBtn) logoutBtn.addEventListener('click', ()=>{
+    if(confirm('Sair do seu perfil neste dispositivo? Você vai precisar digitar sua senha de novo para entrar.')) logout();
+  });
+  const retryWeatherBtn = document.querySelector('[data-retry-weather]');
+  if(retryWeatherBtn) retryWeatherBtn.addEventListener('click', fetchWeather);
+  const root = document.getElementById('view-root');
+  if(state.view==='inicio') root.innerHTML = renderInicio();
+  else if(state.view==='compras') root.innerHTML = renderCompras();
+  else if(state.view==='agenda') root.innerHTML = renderAgenda();
+  else if(state.view==='recados') root.innerHTML = renderRecados();
+  else if(state.view==='casa') root.innerHTML = renderCasa();
+  else if(state.view==='contatos') root.innerHTML = renderContatos();
+  else if(state.view==='projetos') root.innerHTML = state.currentProject ? renderProjectDetail() : renderProjetos();
+  attachHandlers();
+}
+
+// ---------- INÍCIO ----------
+function renderInicio(){
+  const d = state.data;
+  const alerts = computeAlerts();
+  const upcomingEvents = d.agenda.events
+    .map(ev=>({ev, occ:nextOccurrence(ev)}))
+    .sort((a,b)=>a.occ-b.occ);
+  const nextCompromissos = upcomingEvents.filter(x=>x.ev.type!=='aniversario').slice(0,4);
+  const birthdays = upcomingEvents.filter(x=>x.ev.type==='aniversario' && daysDiff(x.occ,new Date())<=60).slice(0,5);
+  const events14 = upcomingEvents.filter(x=>x.ev.type==='evento' && daysDiff(x.occ,new Date())<=14).slice(0,5);
+
+  const urgentMsgs = d.messages.messages.filter(m=>!m.done).sort((a,b)=>prioRank(a.priority)-prioRank(b.priority)).slice(0,4);
+  const pendingTasks = d.home.tasks.filter(t=>!t.done).slice(0,4);
+  const shoppingCounts = Object.entries(d.shopping.lists).map(([k,items])=>({k,pending:items.filter(i=>!i.comprado).length}));
+  const totalPending = shoppingCounts.reduce((s,c)=>s+c.pending,0);
+
+  return `
+    ${alerts.length? `<div>${alerts.map(a=>`
+      <div class="alert">
+        <span>💡</span>
+        <span style="flex:1">${escapeHtml(a.text)} ${a.type==='stock'?`<button class="link" data-add-stock="${escapeHtml(a.itemName)}" data-add-stock-cat="${a.category}">Adicionar à lista</button>`:''}</span>
+        <button class="x" data-dismiss="${a.key}">×</button>
+      </div>`).join('')}</div>` : ''}
+
+    <div class="grid">
+      <div class="card">
+        <div class="section-title">Próximos compromissos</div>
+        ${nextCompromissos.length? nextCompromissos.map(({ev,occ})=>`
+          <div class="row-item"><span>${EVENT_TYPES[ev.type]?.icon||'📌'}</span>
+            <span class="item-name">${escapeHtml(ev.title)}</span>
+            <span class="contact-role">${fmtDate(occ.toISOString().slice(0,10))}${ev.time? ' · '+ev.time:''}</span>
+          </div>`).join('') : `<div class="empty">Nada agendado por enquanto.</div>`}
+      </div>
+      <div class="card">
+        <div class="section-title">Recados importantes</div>
+        ${urgentMsgs.length? urgentMsgs.map(m=>`
+          <div class="row-item"><span class="badge ${m.priority}">${prioLabel(m.priority)}</span>
+            <span class="item-name">${escapeHtml(m.text)}</span></div>`).join('') : `<div class="empty">Nenhum recado pendente.</div>`}
+      </div>
+      <div class="card">
+        <div class="section-title">Tarefas pendentes da casa</div>
+        ${pendingTasks.length? pendingTasks.map(t=>`
+          <div class="row-item"><span class="chk" data-toggle-task="${t.id}"></span>
+            <span class="item-name">${escapeHtml(t.title)}</span>
+            <span class="contact-role">${escapeHtml(t.responsavel||'')}</span></div>`).join('') : `<div class="empty">Nenhuma tarefa pendente. 🎉</div>`}
+      </div>
+      <div class="card">
+        <div class="section-title">Lista de compras</div>
+        ${shoppingCounts.map(c=>`
+          <div class="row-item"><span class="dot" style="background:${LIST_META[c.k].color}"></span>
+            <span class="item-name">${LIST_META[c.k].label}</span>
+            <span class="contact-role">${c.pending} pendente(s)</span></div>`).join('')}
+        <div class="divider"></div>
+        <div style="font-size:13px;color:var(--ink-soft)">Total: <b>${totalPending}</b> itens · previsão <b>${fmtBRL(Object.values(d.shopping.lists).flat().reduce((s,i)=>s+((d.shopping.prices[i.name.toLowerCase()]||0)*(i.qty||1)),0))}</b></div>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:14px">
+      <div class="card">
+        <div class="section-title">Aniversários próximos</div>
+        ${birthdays.length? birthdays.map(({ev,occ})=>`
+          <div class="row-item"><span>🎂</span><span class="item-name">${escapeHtml(ev.title)}</span>
+            <span class="contact-role">${fmtDate(occ.toISOString().slice(0,10))}</span></div>`).join('') : `<div class="empty">Nenhum nos próximos 60 dias.</div>`}
+      </div>
+      <div class="card">
+        <div class="section-title">Eventos</div>
+        ${events14.length? events14.map(({ev,occ})=>`
+          <div class="row-item"><span>✨</span><span class="item-name">${escapeHtml(ev.title)}</span>
+            <span class="contact-role">${fmtDate(occ.toISOString().slice(0,10))}</span></div>`).join('') : `<div class="empty">Nenhum nos próximos 14 dias.</div>`}
+      </div>
+    </div>
+
+    ${renderProjectsProgressCard()}
+  `;
+}
+const PHASE_ORDER = ['ideia','planejamento','andamento','concluido'];
+const PHASE_LABELS = {ideia:'Ideia', planejamento:'Planejamento', andamento:'Em andamento', concluido:'Concluído'};
+function renderPhaseStepper(status){
+  const effective = status==='pausado' ? 'andamento' : status;
+  const idx = PHASE_ORDER.indexOf(effective);
+  return `
+    <div style="display:flex;align-items:center;gap:2px;flex:1;min-width:180px">
+      ${PHASE_ORDER.map((ph,i)=>`
+        <div style="display:flex;align-items:center;flex:${i<PHASE_ORDER.length-1?'1':'0'}">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0">
+            <div style="width:11px;height:11px;border-radius:50%;flex:0 0 auto;
+              background:${i<=idx? (status==='pausado' && i===idx ? 'var(--secondary)' : 'var(--primary)') : 'var(--border)'};
+              ${i===idx && status==='pausado' ? 'box-shadow:0 0 0 3px var(--secondary-tint);' : (i===idx?'box-shadow:0 0 0 3px var(--primary-tint);':'')}
+            "></div>
+            <span style="font-size:9.5px;color:${i<=idx?'var(--ink-soft)':'var(--ink-faint)'};font-weight:${i===idx?'700':'500'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px">${PHASE_LABELS[ph]}</span>
+          </div>
+          ${i<PHASE_ORDER.length-1? `<div style="height:2px;flex:1;background:${i<idx?'var(--primary)':'var(--border)'};margin:0 2px 14px"></div>` : ''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+function renderProjectsProgressCard(){
+  const projects = state.data.projects.projects;
+  if(!projects.length) return '';
+  const active = projects.filter(p=>p.status!=='concluido');
+  const list = active.length ? active : projects.slice(0,3);
+  return `
+    <div class="card" style="margin-top:14px">
+      <div class="section-title">Progresso dos projetos</div>
+      <div class="stack">
+        ${list.map(p=>{
+          const total = p.checklist.length, doneCount = p.checklist.filter(c=>c.done).length;
+          const pct = total? Math.round(doneCount/total*100) : 0;
+          return `<div style="padding:8px 0;border-bottom:1px solid var(--border)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px;flex-wrap:wrap">
+              <button data-open-project-from-home="${p.id}" style="background:none;border:none;padding:0;font-weight:700;font-size:14px;color:var(--ink);cursor:pointer;text-align:left">${escapeHtml(p.name)}</button>
+              <span style="display:flex;align-items:center;gap:6px">
+                ${p.status==='pausado'? `<span class="badge status" style="background:var(--secondary-tint);color:#8A6A22">⏸ Pausado</span>`:''}
+                <span class="contact-role">${pct}%</span>
+              </span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+              ${renderPhaseStepper(p.status)}
+            </div>
+            <div class="progress-bar" style="margin-top:8px"><div style="width:${pct}%"></div></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+function prioRank(p){ return p==='urgente'?0:p==='hoje'?1:2; }
+function prioLabel(p){ return p==='urgente'?'Urgente':p==='hoje'?'Hoje':'Quando puder'; }
+
+// ---------- COMPRAS ----------
+function renderCompras(){
+  const d = state.data;
+  const sub = state.shopSubtab;
+  const subtabs = [...Object.keys(LIST_META), 'favoritos','estoque','historico'];
+  const subLabel = {favoritos:'Favoritos', estoque:'Estoque', historico:'Histórico'};
+
+  let body = '';
+  if(LIST_META[sub]){
+    const items = d.shopping.lists[sub];
+    const pendingNames = new Set(items.map(i=>i.name.toLowerCase()));
+    const catalog = Object.entries(d.shopping.stock)
+      .filter(([name,entry])=>entry.category===sub && !pendingNames.has(name.toLowerCase()))
+      .map(([name])=>name)
+      .sort((a,b)=>a.localeCompare(b));
+    body = `
+      <form class="inline" data-form="add-item">
+        <input type="text" name="name" list="catalog-${sub}" placeholder="Nome do item" required style="flex:2;min-width:140px">
+        <datalist id="catalog-${sub}">${catalog.map(n=>`<option value="${escapeHtml(n)}">`).join('')}</datalist>
+        <input type="number" name="qty" placeholder="Qtd" min="1" value="1" style="width:70px">
+        <button class="btn" type="submit">Adicionar</button>
+      </form>
+      ${catalog.length? `
+        <div style="margin-bottom:14px">
+          <div class="contact-role" style="margin-bottom:6px">Itens já cadastrados — toque para adicionar</div>
+          <div class="pill-select">
+            ${catalog.map(n=>`<button type="button" data-quick-item="${sub}:${escapeHtml(n)}">+ ${escapeHtml(n)}</button>`).join('')}
+          </div>
+        </div>
+        <div class="divider"></div>
+      ` : ''}
+      ${items.length? items.map(i=>{
+        const priceVal = d.shopping.prices[i.name.toLowerCase()] || '';
+        const lineTotal = (d.shopping.prices[i.name.toLowerCase()]||0) * (i.qty||1);
+        const otherLists = Object.keys(LIST_META).filter(k=>k!==sub);
+        return `
+        <div class="row-item" style="flex-wrap:wrap">
+          <span class="chk ${i.comprado?'done':''}" data-toggle-item="${sub}:${i.id}">${i.comprado?'✓':''}</span>
+          <span class="item-name ${i.comprado?'done':''}" style="flex:1 1 110px">${escapeHtml(i.name)}</span>
+          <span style="display:flex;align-items:center;gap:3px;font-size:12px;color:var(--ink-soft)">Qtd
+            <input type="number" min="1" step="1" value="${i.qty||1}" data-qty="${sub}:${i.id}" style="width:46px;padding:5px 6px;font-size:13px">
+          </span>
+          <span style="display:flex;align-items:center;gap:3px;font-size:12.5px;color:var(--ink-soft)">R$
+            <input type="number" min="0" step="0.01" value="${priceVal}" placeholder="0,00" data-price="${escapeHtml(i.name)}" style="width:62px;padding:5px 6px;font-size:13px">
+          </span>
+          <span class="contact-role" style="min-width:60px;text-align:right;font-weight:600">${fmtBRL(lineTotal)}</span>
+          <select data-transfer="${sub}:${i.id}" style="border:1.4px solid var(--border);border-radius:8px;padding:5px 6px;font-size:12px;color:var(--ink-soft)">
+            <option value="">Mover…</option>
+            ${otherLists.map(k=>`<option value="${k}">→ ${LIST_META[k].label}</option>`).join('')}
+          </select>
+          <button class="icon-btn ${isFav(i.name)?'fav-star':''}" data-fav="${escapeHtml(i.name)}" title="Favoritar">★</button>
+          <button class="icon-btn" data-del-item="${sub}:${i.id}" title="Remover">✕</button>
+        </div>`;
+      }).join('') : `<div class="empty">Lista vazia. Adicione o primeiro item.</div>`}
+      ${items.length? `
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;font-size:14.5px;font-weight:700">
+          <span>Previsão de compra</span>
+          <span>${fmtBRL(items.reduce((s,i)=>s+((d.shopping.prices[i.name.toLowerCase()]||0)*(i.qty||1)),0))}</span>
+        </div>
+      ` : ''}
+      ${items.some(i=>i.comprado)? `<div style="margin-top:12px"><button class="btn secondary small" data-finish-list="${sub}">Finalizar compra</button></div>`:''}
+    `;
+  } else if(sub==='favoritos'){
+    body = d.shopping.favorites.length ? d.shopping.favorites.map(name=>`
+      <div class="row-item"><span class="fav-star">★</span><span class="item-name">${escapeHtml(name)}</span>
+        <select data-quick-add="${escapeHtml(name)}" style="border:1.4px solid var(--border);border-radius:8px;padding:5px 8px;font-size:12.5px">
+          <option value="">+ adicionar em…</option>
+          ${Object.entries(LIST_META).map(([k,m])=>`<option value="${k}">${m.label}</option>`).join('')}
+        </select>
+        <button class="icon-btn" data-unfav="${escapeHtml(name)}">✕</button>
+      </div>`).join('') : `<div class="empty">Marque itens com ★ para vê-los aqui.</div>`;
+  } else if(sub==='estoque'){
+    body = `
+      <form class="inline" data-form="add-stock">
+        <input type="text" name="name" placeholder="Novo produto (ex: Fralda)" required style="flex:2;min-width:140px">
+        <select name="category">${Object.entries(LIST_META).map(([k,m])=>`<option value="${k}">${m.label}</option>`).join('')}</select>
+        <input type="number" name="price" min="0" step="0.01" placeholder="Valor médio R$" style="width:120px">
+        <button class="btn" type="submit">Cadastrar</button>
+      </form>
+      ${Object.keys(LIST_META).map(cat=>{
+        const entries = Object.entries(d.shopping.stock).filter(([,e])=>e.category===cat).sort((a,b)=>a[0].localeCompare(b[0]));
+        if(!entries.length) return '';
+        return `<div style="margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span class="dot" style="background:${LIST_META[cat].color}"></span>
+            <b style="font-size:13.5px">${LIST_META[cat].label}</b>
+            <span class="contact-role">${entries.length} itens</span>
+          </div>
+          ${entries.map(([name,entry])=>{
+            const status = entry.status;
+            const priceVal = d.shopping.prices[name.toLowerCase()] || '';
+            return `<div class="row-item" style="flex-wrap:wrap">
+              <span class="item-name" style="flex:1 1 110px">${escapeHtml(name)}</span>
+              <span style="display:flex;align-items:center;gap:3px;font-size:12px;color:var(--ink-soft)">R$
+                <input type="number" min="0" step="0.01" value="${priceVal}" placeholder="0,00" data-price="${escapeHtml(name)}" style="width:62px;padding:5px 6px;font-size:13px">
+              </span>
+              <select data-stock-category="${escapeHtml(name)}" style="border:1.4px solid var(--border);border-radius:8px;padding:5px 6px;font-size:12px;color:var(--ink-soft)">
+                ${Object.entries(LIST_META).map(([k,m])=>`<option value="${k}" ${cat===k?'selected':''}>${m.label}</option>`).join('')}
+              </select>
+              <div class="pill-select">
+                ${['tem','pouco','acabou'].map(s=>`<button data-stock="${escapeHtml(name)}:${s}" class="${status===s?'sel':''}" style="${status===s? 'background:'+(s==='tem'?'var(--primary)':s==='pouco'?'var(--secondary)':'var(--urgent)'):''}">${s==='tem'?'Tem':s==='pouco'?'Pouco':'Acabou'}</button>`).join('')}
+              </div>
+              <button class="icon-btn" data-del-stock="${escapeHtml(name)}">✕</button>
+            </div>`;
+          }).join('')}
+        </div>`;
+      }).join('')}
+    `;
+  } else if(sub==='historico'){
+    body = d.shopping.history.length ? d.shopping.history.slice().reverse().map(h=>`
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--ink-soft);margin-bottom:6px">
+          <b style="color:var(--ink)">${LIST_META[h.list]?.label||h.list}</b><span>${fmtDate(h.date)}</span>
+        </div>
+        <div style="font-size:13.5px">${h.items.map(i=>escapeHtml(i.name)).join(', ')}</div>
+      </div>`).join('') : `<div class="empty">Ainda não há histórico de compras.</div>`;
+  }
+
+  const grandTotal = Object.values(d.shopping.lists).flat()
+    .reduce((s,i)=>s+((d.shopping.prices[i.name.toLowerCase()]||0)*(i.qty||1)),0);
+
+  return `
+    <div class="card" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <span class="section-title" style="margin:0">Previsão total de compras</span>
+      <span style="font-family:'Fraunces',serif;font-size:20px;font-weight:700">${fmtBRL(grandTotal)}</span>
+    </div>
+    <div class="subtabs">
+      ${subtabs.map(k=>`<button class="${sub===k?'active':''}" data-shop-sub="${k}" style="${sub===k?'background:'+(LIST_META[k]?LIST_META[k].color:'var(--primary)'):''}">${LIST_META[k]?LIST_META[k].label:subLabel[k]}</button>`).join('')}
+    </div>
+    <div class="card">${body}</div>
+  `;
+}
+function isFav(name){ return state.data.shopping.favorites.some(f=>f.toLowerCase()===name.toLowerCase()); }
+
+// ---------- AGENDA ----------
+function occurrencesInMonth(ev, year, month){
+  const start = new Date(ev.date+'T00:00:00');
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month+1, 0);
+  const results = [];
+  if(!ev.recurring || ev.recurring==='none'){
+    if(start>=first && start<=last) results.push(new Date(start));
+    return results;
+  }
+  if(ev.recurring==='yearly'){
+    if(start.getMonth()===month){
+      const dd = new Date(year, month, start.getDate());
+      if(dd>=start) results.push(dd);
+    }
+    return results;
+  }
+  if(ev.recurring==='monthly'){
+    const dd = new Date(year, month, Math.min(start.getDate(), last.getDate()));
+    if(dd>=first && dd<=last && dd>=start) results.push(dd);
+    return results;
+  }
+  if(ev.recurring==='weekly'){
+    let dd = new Date(start);
+    while(dd < first) dd.setDate(dd.getDate()+7);
+    while(dd <= last){
+      if(dd>=start) results.push(new Date(dd));
+      dd.setDate(dd.getDate()+7);
+    }
+    return results;
+  }
+  return results;
+}
+const WEEKDAYS_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const MONTHS_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+function isoLocal(dt){
+  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+}
+function renderCalendar(){
+  const d = state.data;
+  const year = state.calYear, month = state.calMonth;
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month+1, 0);
+  const startOffset = first.getDay();
+  const totalDays = last.getDate();
+
+  const dayMap = {};
+  d.agenda.events.forEach(ev=>{
+    occurrencesInMonth(ev, year, month).forEach(occ=>{
+      const key = isoLocal(occ);
+      (dayMap[key] = dayMap[key]||[]).push(ev);
+    });
+  });
+
+  const todayKey = todayISO();
+  let cells = '';
+  for(let i=0;i<startOffset;i++) cells += `<div></div>`;
+  for(let day=1; day<=totalDays; day++){
+    const dt = new Date(year, month, day);
+    const key = isoLocal(dt);
+    const evs = dayMap[key] || [];
+    const isToday = key===todayKey;
+    const isSelected = key===state.selectedDate;
+    cells += `<button data-cal-day="${key}" style="
+        aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+        border-radius:10px; border:1.4px solid ${isSelected?'var(--primary)':'transparent'};
+        background:${isToday?'var(--today-tint)':'var(--surface-2)'}; color:var(--ink); font-size:12.5px; font-weight:${isToday?'700':'500'};
+      ">
+      <span>${day}</span>
+      ${evs.length? `<span style="display:flex;gap:2px">${evs.slice(0,3).map(()=>`<span style="width:5px;height:5px;border-radius:50%;background:var(--primary)"></span>`).join('')}</span>` : ''}
+    </button>`;
+  }
+
+  const selEvs = state.selectedDate ? (dayMap[state.selectedDate]||[]) : [];
+  return `
+    <div class="card" style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <button class="icon-btn" data-cal-nav="-1" style="font-size:18px">‹</button>
+        <b class="display" style="font-size:16px">${MONTHS_PT[month]} ${year}</b>
+        <button class="icon-btn" data-cal-nav="1" style="font-size:18px">›</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px">
+        ${WEEKDAYS_PT.map(w=>`<div style="text-align:center;font-size:11px;color:var(--ink-faint);font-weight:700">${w}</div>`).join('')}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${cells}</div>
+      <div style="text-align:center;margin-top:10px"><button class="btn ghost small" data-cal-today>Hoje</button></div>
+    </div>
+    ${state.selectedDate ? `
+      <div class="section-title" style="margin:4px 0 10px">${fmtDateFull(state.selectedDate)}</div>
+      ${selEvs.length? `<div class="grid">
+        ${selEvs.map(ev=>`
+          <div class="card" style="padding:14px;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <span style="font-size:24px;line-height:1">${EVENT_TYPES[ev.type]?.icon||'📌'}</span>
+              <button class="icon-btn" data-del-event="${ev.id}" title="Remover">✕</button>
+            </div>
+            <div style="font-weight:700;font-size:14.5px">${escapeHtml(ev.title)}</div>
+            <div class="contact-role">${EVENT_TYPES[ev.type]?.label||''}</div>
+            ${ev.time? `<div class="contact-role">🕐 ${ev.time}</div>`:''}
+            ${ev.person? `<div class="contact-role">👤 ${escapeHtml(ev.person)}</div>`:''}
+            ${ev.recurring && ev.recurring!=='none'? `<span class="badge status" style="align-self:flex-start;margin-top:2px">🔁 recorrente</span>`:''}
+          </div>
+        `).join('')}
+      </div>` : `<div class="card"><div class="empty">Nenhum compromisso neste dia.</div></div>`}
+    ` : ''}
+  `;
+}
+function renderAgenda(){
+  const d = state.data;
+  const withOcc = d.agenda.events.map(ev=>({ev, occ:nextOccurrence(ev)})).sort((a,b)=>a.occ-b.occ);
+  const prefillDate = state.selectedDate || todayISO();
+  return `
+    <div class="subtabs">
+      <button class="${state.agendaView==='lista'?'active':''}" data-agenda-view="lista" style="${state.agendaView==='lista'?'background:var(--primary)':''}">Lista</button>
+      <button class="${state.agendaView==='calendario'?'active':''}" data-agenda-view="calendario" style="${state.agendaView==='calendario'?'background:var(--primary)':''}">Calendário</button>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">Novo compromisso</div>
+      <form data-form="add-event">
+        <div class="form-grid">
+          <div class="field"><label>Título</label><input name="title" required placeholder="Ex: Consulta pediatra"></div>
+          <div class="field"><label>Tipo</label><select name="type">${Object.entries(EVENT_TYPES).map(([k,v])=>`<option value="${k}">${v.icon} ${v.label}</option>`).join('')}</select></div>
+          <div class="field"><label>Data</label><input type="date" name="date" required value="${prefillDate}"></div>
+          <div class="field"><label>Hora (opcional)</label><input type="time" name="time"></div>
+          <div class="field"><label>Quem</label><input name="person" placeholder="Ex: Ambos, Ana, Rafael"></div>
+          <div class="field"><label>Repetição</label><select name="recurring">
+            <option value="none">Não repete</option><option value="weekly">Toda semana</option>
+            <option value="monthly">Todo mês</option><option value="yearly">Todo ano</option>
+          </select></div>
+        </div>
+        <button class="btn" type="submit">Adicionar à agenda</button>
+      </form>
+    </div>
+    ${state.agendaView==='calendario' ? renderCalendar() : `
+    <div class="card">
+      <div class="section-title">Compromissos</div>
+      ${withOcc.length? withOcc.map(({ev,occ})=>`
+        <div class="row-item">
+          <span>${EVENT_TYPES[ev.type]?.icon||'📌'}</span>
+          <div style="flex:1">
+            <div class="item-name">${escapeHtml(ev.title)}</div>
+            <div class="contact-role">${fmtDate(occ.toISOString().slice(0,10))}${ev.time?' · '+ev.time:''}${ev.person?' · '+escapeHtml(ev.person):''}${ev.recurring!=='none'?' · recorrente':''}</div>
+          </div>
+          <button class="icon-btn" data-del-event="${ev.id}">✕</button>
+        </div>`).join('') : `<div class="empty">Nenhum compromisso cadastrado.</div>`}
+    </div>`}
+  `;
+}
+
+// ---------- RECADOS ----------
+function renderRecados(){
+  const d = state.data;
+  const sorted = d.messages.messages.slice().sort((a,b)=>prioRank(a.priority)-prioRank(b.priority));
+  return `
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">Novo recado</div>
+      <form data-form="add-message">
+        <div class="form-grid">
+          <div class="field" style="grid-column:1/-1"><label>Mensagem</label><input name="text" required placeholder="Ex: Levar roupa da lavanderia"></div>
+          <div class="field"><label>Prioridade</label><select name="priority">
+            <option value="urgente">Urgente</option><option value="hoje" selected>Hoje</option><option value="quando_puder">Quando puder</option>
+          </select></div>
+          <div class="field"><label>De</label><input name="author" placeholder="Seu nome" value="${escapeHtml(state.currentUser||'')}"></div>
+        </div>
+        <button class="btn" type="submit">Fixar no mural</button>
+      </form>
+    </div>
+    <div class="card">
+      <div class="section-title">Mural</div>
+      ${sorted.length? sorted.map(m=>`
+        <div class="row-item">
+          <span class="chk ${m.done?'done':''}" data-toggle-msg="${m.id}">${m.done?'✓':''}</span>
+          <span class="badge ${m.priority}">${prioLabel(m.priority)}</span>
+          <span class="item-name ${m.done?'done':''}">${escapeHtml(m.text)}</span>
+          <span class="contact-role">${escapeHtml(m.author||'')}</span>
+          <button class="icon-btn" data-del-msg="${m.id}">✕</button>
+        </div>`).join('') : `<div class="empty">Nenhum recado no mural.</div>`}
+    </div>
+  `;
+}
+
+// ---------- CASA ----------
+function renderCasa(){
+  const d = state.data;
+  const tasks = d.home.tasks.slice().sort((a,b)=>(a.done-b.done) || (new Date(a.dueDate||'2999-01-01') - new Date(b.dueDate||'2999-01-01')));
+  return `
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">Nova tarefa</div>
+      <form data-form="add-task">
+        <div class="form-grid">
+          <div class="field"><label>Tarefa</label><input name="title" required placeholder="Ex: Trocar filtro do ar-condicionado"></div>
+          <div class="field"><label>Responsável</label><input name="responsavel" placeholder="Nome"></div>
+          <div class="field"><label>Categoria</label><select name="category">${Object.entries(TASK_CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div>
+          <div class="field"><label>Vencimento (opcional)</label><input type="date" name="dueDate"></div>
+        </div>
+        <button class="btn" type="submit">Adicionar tarefa</button>
+      </form>
+    </div>
+    <div class="card">
+      <div class="section-title">Tarefas da casa</div>
+      ${tasks.length? tasks.map(t=>`
+        <div class="row-item">
+          <span class="chk ${t.done?'done':''}" data-toggle-task="${t.id}">${t.done?'✓':''}</span>
+          <div style="flex:1">
+            <div class="item-name ${t.done?'done':''}">${escapeHtml(t.title)}</div>
+            <div class="contact-role">${TASK_CATS[t.category]||''}${t.responsavel?' · '+escapeHtml(t.responsavel):''}${t.dueDate?' · vence '+fmtDate(t.dueDate):''}</div>
+          </div>
+          <button class="icon-btn" data-del-task="${t.id}">✕</button>
+        </div>`).join('') : `<div class="empty">Nenhuma tarefa cadastrada.</div>`}
+    </div>
+  `;
+}
+
+// ---------- CONTATOS ----------
+function renderContatos(){
+  const d = state.data;
+  return `
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">Novo contato</div>
+      <form data-form="add-contact">
+        <div class="form-grid">
+          <div class="field"><label>Nome</label><input name="name" required placeholder="Ex: Dra. Camila"></div>
+          <div class="field"><label>Papel</label><select name="role">${CONTACT_ROLES.map(r=>`<option value="${r}">${r}</option>`).join('')}</select></div>
+          <div class="field"><label>Telefone</label><input name="phone" placeholder="(xx) xxxxx-xxxx"></div>
+          <div class="field"><label>Notas</label><input name="notes" placeholder="Opcional"></div>
+        </div>
+        <button class="btn" type="submit">Salvar contato</button>
+      </form>
+    </div>
+    <div class="card">
+      <div class="section-title">Contatos importantes</div>
+      ${d.contacts.contacts.length? d.contacts.contacts.map(c=>`
+        <div class="row-item">
+          <div style="flex:1">
+            <div class="item-name">${escapeHtml(c.name)}</div>
+            <div class="contact-role">${escapeHtml(c.role)}${c.notes?' · '+escapeHtml(c.notes):''}</div>
+          </div>
+          ${c.phone? `<a href="tel:${escapeHtml(c.phone.replace(/\\D/g,''))}" class="btn ghost small">Ligar</a>` : ''}
+          <button class="icon-btn" data-del-contact="${c.id}">✕</button>
+        </div>`).join('') : `<div class="empty">Nenhum contato cadastrado.</div>`}
+    </div>
+  `;
+}
+
+// ---------- PROJETOS ----------
+const SUGGESTED_PROJECTS = ['Reforma da casa','Comprar carro','Viagem','Festa de aniversário','Natal','Planejamento familiar','Férias','Mobiliar apartamento','Cursos','Novo negócio'];
+function renderProjetos(){
+  const d = state.data;
+  return `
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">Novo projeto</div>
+      <form data-form="add-project" class="inline">
+        <input list="suggested" name="name" placeholder="Nome do projeto" required style="flex:2;min-width:160px">
+        <datalist id="suggested">${SUGGESTED_PROJECTS.map(p=>`<option value="${p}">`).join('')}</datalist>
+        <button class="btn" type="submit">Criar projeto</button>
+      </form>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${SUGGESTED_PROJECTS.map(p=>`<button class="btn ghost small" data-quick-project="${escapeHtml(p)}">${p}</button>`).join('')}
+      </div>
+    </div>
+    <div class="proj-grid">
+      ${d.projects.projects.length? d.projects.projects.map(p=>{
+        const total = p.checklist.length, doneCount = p.checklist.filter(c=>c.done).length;
+        const pct = total? Math.round(doneCount/total*100) : 0;
+        return `<button class="project-card" data-open-project="${p.id}">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h3 style="margin:0;font-size:16px">${escapeHtml(p.name)}</h3>
+            <span class="badge status">${PROJECT_PRIORITY[p.priority]}</span>
+          </div>
+          <div class="contact-role">${PROJECT_STATUS[p.status]}</div>
+          <div class="progress-bar"><div style="width:${pct}%"></div></div>
+          <div class="contact-role">${pct}% concluído · ${doneCount}/${total} itens</div>
+        </button>`;
+      }).join('') : `<div class="empty">Nenhum projeto ainda. Crie o primeiro acima.</div>`}
+    </div>
+  `;
+}
+function mergeTimeline(p){
+  const items = [];
+  p.timeline.forEach(t=>items.push({date:t.date, label:t.label, type:'milestone', id:t.id}));
+  p.checklist.filter(c=>c.startDate || c.endDate).forEach(c=>items.push({
+    date:c.endDate || c.startDate, startDate:c.startDate, endDate:c.endDate,
+    label:c.text, type:'checklist', done:c.done, value:c.value, id:c.id
+  }));
+  return items.sort((a,b)=>new Date(a.date)-new Date(b.date));
+}
+function renderProjectCalendar(p){
+  const items = mergeTimeline(p);
+  const year = state.projCalYear, month = state.projCalMonth;
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month+1, 0);
+  const startOffset = first.getDay();
+  const dayMap = {}; const startMap = {};
+  items.forEach(it=>{ (dayMap[it.date] = dayMap[it.date]||[]).push(it); });
+  items.filter(it=>it.type==='checklist' && it.startDate && it.startDate!==it.date)
+    .forEach(it=>{ (startMap[it.startDate] = startMap[it.startDate]||[]).push(it); });
+  const todayKey = todayISO();
+  let cells = '';
+  for(let i=0;i<startOffset;i++) cells += `<div></div>`;
+  for(let day=1; day<=last.getDate(); day++){
+    const dt = new Date(year, month, day);
+    const key = isoLocal(dt);
+    const evs = dayMap[key] || [];
+    const starts = startMap[key] || [];
+    const isToday = key===todayKey;
+    const isGoal = key===p.deadlineGoal;
+    const titleParts = [...evs.map(e=>e.label), ...starts.map(e=>`início: ${e.label}`)];
+    cells += `<div style="
+        aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+        border-radius:10px; border:1.4px solid ${isGoal?'var(--urgent)':'transparent'};
+        background:${isToday?'var(--today-tint)':'var(--surface-2)'}; font-size:12px; font-weight:${isToday?'700':'500'};
+      " title="${titleParts.join(', ')}">
+      <span>${day}</span>
+      ${(evs.length||starts.length)? `<span style="display:flex;gap:2px">${starts.slice(0,2).map(()=>`<span style="width:5px;height:5px;border-radius:50%;border:1.3px solid var(--primary);background:none"></span>`).join('')}${evs.slice(0,3).map(e=>`<span style="width:5px;height:5px;border-radius:50%;background:${e.type==='milestone'?'var(--secondary)':(e.done?'var(--primary)':'var(--urgent)')}"></span>`).join('')}</span>` : (isGoal?`<span style="font-size:8px">🎯</span>`:'')}
+    </div>`;
+  }
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <button class="icon-btn" data-proj-cal-nav="-1" style="font-size:18px">‹</button>
+      <b class="display" style="font-size:15px">${MONTHS_PT[month]} ${year}</b>
+      <button class="icon-btn" data-proj-cal-nav="1" style="font-size:18px">›</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px">
+      ${WEEKDAYS_PT.map(w=>`<div style="text-align:center;font-size:10.5px;color:var(--ink-faint);font-weight:700">${w}</div>`).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${cells}</div>
+  `;
+}
+function renderProjectDetail(){
+  const p = state.data.projects.projects.find(p=>p.id===state.currentProject);
+  if(!p){ state.currentProject=null; return renderProjetos(); }
+  const total = p.checklist.length, doneCount = p.checklist.filter(c=>c.done).length;
+  const pct = total? Math.round(doneCount/total*100) : 0;
+  const totalValue = p.checklist.reduce((s,c)=>s+(c.value||0),0);
+  const budget = p.budgetGoal;
+  const overBudget = budget!=null && totalValue > budget;
+  const daysToDeadline = p.deadlineGoal ? daysDiff(p.deadlineGoal, new Date()) : null;
+  const timelineItems = mergeTimeline(p);
+
+  return `
+    <button class="back-link" data-back-projects>← Voltar aos projetos</button>
+    <div class="card" style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+        <input class="name-input" data-project-name="${p.id}" value="${escapeHtml(p.name)}">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <select data-change-status="${p.id}">${Object.entries(PROJECT_STATUS).map(([k,v])=>`<option value="${k}" ${p.status===k?'selected':''}>${v}</option>`).join('')}</select>
+          <select data-change-priority="${p.id}">${Object.entries(PROJECT_PRIORITY).map(([k,v])=>`<option value="${k}" ${p.priority===k?'selected':''}>${v}</option>`).join('')}</select>
+        </div>
+      </div>
+      <div class="progress-bar" style="margin-top:10px"><div style="width:${pct}%"></div></div>
+      <div class="contact-role" style="margin-top:4px">${pct}% concluído · ${doneCount}/${total} itens do checklist</div>
+      <div class="contact-role" style="margin-top:2px">↻ status segue o checklist automaticamente — use "Pausado" para congelar</div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">Metas do projeto</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div class="goal-box">
+          <label>Meta de orçamento</label>
+          <input type="number" min="0" step="0.01" placeholder="R$ 0,00" value="${p.budgetGoal!=null?p.budgetGoal:''}" data-budget-goal="${p.id}">
+        </div>
+        <div class="goal-box">
+          <label>Meta de prazo</label>
+          <input type="date" value="${p.deadlineGoal||''}" data-deadline-goal="${p.id}">
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:14px">
+        <span>Previsão de valor total (checklist)</span>
+        <b style="color:${overBudget?'var(--urgent)':'var(--ink)'}">${fmtBRL(totalValue)}${budget!=null? ` / ${fmtBRL(budget)}` : ''}</b>
+      </div>
+      ${budget!=null? `<div class="contact-role">${overBudget? `⚠️ ${fmtBRL(totalValue-budget)} acima do orçamento` : `Dentro do orçamento — restam ${fmtBRL(budget-totalValue)}`}</div>` : ''}
+      ${p.deadlineGoal? `<div class="contact-role" style="margin-top:2px">${daysToDeadline<0? `⚠️ Prazo vencido há ${Math.abs(daysToDeadline)} dia(s)` : daysToDeadline===0? '📅 O prazo é hoje!' : `📅 Faltam ${daysToDeadline} dia(s) para o prazo (${fmtDate(p.deadlineGoal)})`}</div>` : ''}
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">Objetivo</div>
+      <textarea data-objective="${p.id}" placeholder="Ex: Comprar os móveis principais até dezembro">${escapeHtml(p.objective||'')}</textarea>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">Checklist</div>
+      <form data-form="add-checklist" data-pid="${p.id}" class="inline">
+        <input name="text" placeholder="Ex: Sofá" required style="flex:2;min-width:120px">
+        <input name="value" type="number" min="0" step="0.01" placeholder="Valor R$" style="width:100px">
+        <input name="startDate" type="date" title="Data inicial (opcional)" style="width:145px">
+        <input name="endDate" type="date" title="Data final (opcional)" style="width:145px">
+        <button class="btn" type="submit">Adicionar</button>
+      </form>
+      ${p.checklist.length? p.checklist.map(c=>`
+        <div class="row-item" style="flex-wrap:wrap">
+          <span class="chk ${c.done?'done':''}" data-toggle-checklist="${p.id}:${c.id}">${c.done?'✓':''}</span>
+          <span class="item-name ${c.done?'done':''}" style="flex:1 1 110px">${escapeHtml(c.text)}</span>
+          <span style="display:flex;align-items:center;gap:3px;font-size:12px;color:var(--ink-soft)">R$
+            <input type="number" min="0" step="0.01" value="${c.value!=null?c.value:''}" placeholder="0,00" data-checklist-value="${p.id}:${c.id}" style="width:66px;padding:5px 6px;font-size:13px">
+          </span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--ink-faint)">
+            Início <input type="date" value="${c.startDate||''}" data-checklist-start="${p.id}:${c.id}" style="padding:5px 6px;font-size:12.5px;width:130px">
+          </span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--ink-faint)">
+            Fim <input type="date" value="${c.endDate||''}" data-checklist-end="${p.id}:${c.id}" style="padding:5px 6px;font-size:12.5px;width:130px">
+          </span>
+          <button class="icon-btn" data-del-checklist="${p.id}:${c.id}">✕</button>
+        </div>`).join('') : `<div class="empty">Adicione os itens do checklist.</div>`}
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">Cronograma visual</div>
+      ${renderProjectCalendar(p)}
+      <div class="divider"></div>
+      <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap">
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;border:1.3px solid var(--primary);margin-right:4px"></span>Início</span>
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--secondary);margin-right:4px"></span>Marco</span>
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--primary);margin-right:4px"></span>Item concluído</span>
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--urgent);margin-right:4px"></span>Item pendente</span>
+      </div>
+      ${timelineItems.length? `<div class="timeline">
+        ${timelineItems.map(it=>{
+          const overdue = !it.done && new Date(it.date) < new Date(todayISO());
+          const dateLabel = (it.startDate && it.endDate && it.startDate!==it.endDate)
+            ? `${fmtDate(it.startDate)} → ${fmtDate(it.endDate)}` : fmtDate(it.date);
+          return `<div class="tl-item ${it.done?'done':''} ${overdue?'overdue':''}">
+            <span class="tl-dot">${it.type==='milestone'?'📅':(it.done?'✓':'')}</span>
+            <div class="tl-date">${dateLabel}</div>
+            <div class="tl-label">${escapeHtml(it.label)}${it.value?` · ${fmtBRL(it.value)}`:''}${it.type==='milestone'?' · marco':''}</div>
+          </div>`;
+        }).join('')}
+      </div>` : `<div class="empty">Adicione datas ao checklist ou marcos abaixo para ver a linha do tempo.</div>`}
+      <div class="divider"></div>
+      <div class="section-title" style="margin-bottom:8px">Adicionar marco manual</div>
+      <form class="inline" data-form="add-milestone" data-pid="${p.id}">
+        <input name="label" placeholder="Marco (ex: Escolher móveis)" required style="flex:1;min-width:140px">
+        <input type="date" name="date" required>
+        <button class="btn" type="submit">Adicionar</button>
+      </form>
+      ${p.timeline.length? p.timeline.slice().sort((a,b)=>new Date(a.date)-new Date(b.date)).map(t=>`
+        <div class="row-item"><span>📅</span><span class="item-name">${escapeHtml(t.label)}</span>
+          <span class="contact-role">${fmtDate(t.date)}</span>
+          <button class="icon-btn" data-del-milestone="${p.id}:${t.id}">✕</button></div>`).join('') : ''}
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">Anotações</div>
+      <textarea data-notes="${p.id}" placeholder="Escreva ideias, links, medidas...">${escapeHtml(p.notes||'')}</textarea>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Histórico de atividades</div>
+      ${p.activities.length? p.activities.slice().reverse().map(a=>`
+        <div class="row-item"><span class="contact-role" style="min-width:70px">${fmtDate(a.date)}</span><span class="item-name">${escapeHtml(a.text)}</span></div>
+      `).join('') : `<div class="empty">Nada registrado ainda.</div>`}
+      <div class="divider"></div>
+      <button class="btn danger small" data-del-project="${p.id}">Excluir projeto</button>
+    </div>
+  `;
+}
+function logActivity(p, text){
+  p.activities.push({id:uid(), text, date:todayISO()});
+}
+function autoUpdateStatus(p){
+  const total = p.checklist.length;
+  const done = p.checklist.filter(c=>c.done).length;
+  const pct = total ? (done/total*100) : 0;
+  if(total>0 && pct===100){
+    if(p.status!=='concluido'){ p.status='concluido'; logActivity(p, `Status alterado automaticamente para ${PROJECT_STATUS.concluido} (100% do checklist)`); }
+    return;
+  }
+  if(p.status==='pausado') return; // respeita a pausa manual enquanto não está 100% concluído
+  if(pct>0){
+    if(p.status!=='andamento'){ p.status='andamento'; logActivity(p, `Status alterado automaticamente para ${PROJECT_STATUS.andamento} (${Math.round(pct)}% do checklist)`); }
+  }
+}
+
+// ---------- HANDLERS ----------
+function attachHandlers(){
+  const root = document.getElementById('view-root');
+  if(!root) return;
+
+  root.querySelectorAll('[data-dismiss]').forEach(b=>b.addEventListener('click', ()=>dismissAlert(b.dataset.dismiss)));
+  root.querySelectorAll('[data-add-stock]').forEach(b=>b.addEventListener('click', ()=>addStockToList(b.dataset.addStock, b.dataset.addStockCat)));
+  root.querySelectorAll('[data-open-project-from-home]').forEach(b=>b.addEventListener('click', ()=>{
+    state.view='projetos'; state.currentProject=b.dataset.openProjectFromHome; render();
+  }));
+
+  // shopping
+  root.querySelectorAll('[data-shop-sub]').forEach(b=>b.addEventListener('click', ()=>{ state.shopSubtab=b.dataset.shopSub; render(); }));
+  const addItemForm = root.querySelector('[data-form="add-item"]');
+  if(addItemForm) addItemForm.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const name = fd.get('name').trim(); if(!name) return;
+    state.data.shopping.lists[state.shopSubtab].push({id:uid(), name, qty:parseInt(fd.get('qty'))||1, comprado:false});
+    await saveKey('shopping'); render();
+  });
+  root.querySelectorAll('[data-quick-item]').forEach(el=>el.addEventListener('click', async ()=>{
+    const idx = el.dataset.quickItem.indexOf(':');
+    const list = el.dataset.quickItem.slice(0,idx);
+    const name = el.dataset.quickItem.slice(idx+1);
+    state.data.shopping.lists[list].push({id:uid(), name, qty:1, comprado:false});
+    await saveKey('shopping'); render();
+  }));
+  root.querySelectorAll('[data-price]').forEach(el=>el.addEventListener('change', async ()=>{
+    const name = el.dataset.price.toLowerCase();
+    const val = parseFloat(el.value);
+    if(isNaN(val) || val<0){ delete state.data.shopping.prices[name]; }
+    else state.data.shopping.prices[name] = val;
+    await saveKey('shopping'); render();
+  }));
+  root.querySelectorAll('[data-transfer]').forEach(el=>el.addEventListener('change', async ()=>{
+    const target = el.value; if(!target) return;
+    const [list,id] = el.dataset.transfer.split(':');
+    const idx = state.data.shopping.lists[list].findIndex(i=>i.id===id);
+    if(idx>-1){
+      const [item] = state.data.shopping.lists[list].splice(idx,1);
+      item.id = uid();
+      state.data.shopping.lists[target].push(item);
+    }
+    await saveKey('shopping'); render();
+  }));
+  root.querySelectorAll('[data-toggle-item]').forEach(el=>el.addEventListener('click', async ()=>{
+    const [list,id] = el.dataset.toggleItem.split(':');
+    const item = state.data.shopping.lists[list].find(i=>i.id===id);
+    item.comprado = !item.comprado;
+    await saveKey('shopping'); render();
+  }));
+  root.querySelectorAll('[data-del-item]').forEach(el=>el.addEventListener('click', async ()=>{
+    const [list,id] = el.dataset.delItem.split(':');
+    state.data.shopping.lists[list] = state.data.shopping.lists[list].filter(i=>i.id!==id);
+    await saveKey('shopping'); render();
+  }));
+  root.querySelectorAll('[data-fav]').forEach(el=>el.addEventListener('click', async ()=>{
+    const name = el.dataset.fav;
+    if(!isFav(name)) state.data.shopping.favorites.push(name);
+    else state.data.shopping.favorites = state.data.shopping.favorites.filter(f=>f.toLowerCase()!==name.toLowerCase());
+    await saveKey('shopping'); render();
+  }));
+  root.querySelectorAll('[data-unfav]').forEach(el=>el.addEventListener('click', async ()=>{
+    state.data.shopping.favorites = state.data.shopping.favorites.filter(f=>f!==el.dataset.unfav);
+    await saveKey('shopping'); render();
+  }));
+  root.querySelectorAll('[data-quick-add]').forEach(el=>el.addEventListener('change', async ()=>{
+    const list = el.value; if(!list) return;
+    const name = el.dataset.quickAdd;
+    state.data.shopping.lists[list].push({id:uid(), name, qty:1, comprado:false});
+    await saveKey('shopping'); render();
+  }));
+  root.querySelectorAll('[data-finish-list]').forEach(el=>el.addEventListener('click', async ()=>{
+    const list = el.dataset.finishList;
+    const bought = state.data.shopping.lists[list].filter(i=>i.comprado);
+    if(!bought.length) return;
+    state.data.shopping.history.push({id:uid(), list, date:todayISO(), items:bought.map(i=>({name:i.name, qty:i.qty}))});
+    bought.forEach(i=>{
+      const existing = state.data.shopping.stock[i.name];
+      state.data.shopping.stock[i.name] = {status:'tem', category: existing ? existing.category : list};
+    });
+    state.data.shopping.lists[list] = state.data.shopping.lists[list].filter(i=>!i.comprado);
+    await saveKey('shopping'); render();
+  }));
+  root.querySelectorAll('[data-qty]').forEach(el=>el.addEventListener('change', async ()=>{
+    const [list,id] = el.dataset.qty.split(':');
+    const item = state.data.shopping.lists[list].find(i=>i.id===id);
+    const val = parseInt(el.value);
+    item.qty = (isNaN(val) || val<1) ? 1 : val;
+    await saveKey('shopping'); render();
+  }));
+  const addStockForm = root.querySelector('[data-form="add-stock"]');
+  if(addStockForm) addStockForm.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const name = fd.get('name').trim(); if(!name) return;
+    state.data.shopping.stock[name] = {status:'tem', category:fd.get('category')};
+    const priceVal = parseFloat(fd.get('price'));
+    if(!isNaN(priceVal) && priceVal>=0) state.data.shopping.prices[name.toLowerCase()] = priceVal;
+    await saveKey('shopping'); render();
+  });
+  root.querySelectorAll('[data-stock-category]').forEach(el=>el.addEventListener('change', async ()=>{
+    state.data.shopping.stock[el.dataset.stockCategory].category = el.value;
+    await saveKey('shopping'); render();
+  }));
+  root.querySelectorAll('[data-stock]').forEach(el=>el.addEventListener('click', async ()=>{
+    const [name,status] = el.dataset.stock.split(':');
+    state.data.shopping.stock[name].status = status;
+    await saveKey('shopping'); render();
+  }));
+  root.querySelectorAll('[data-del-stock]').forEach(el=>el.addEventListener('click', async ()=>{
+    delete state.data.shopping.stock[el.dataset.delStock];
+    await saveKey('shopping'); render();
+  }));
+
+  // agenda
+  const addEventForm = root.querySelector('[data-form="add-event"]');
+  if(addEventForm) addEventForm.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    state.data.agenda.events.push({id:uid(), title:fd.get('title'), type:fd.get('type'), date:fd.get('date'), time:fd.get('time'), person:fd.get('person'), recurring:fd.get('recurring')});
+    await saveKey('agenda'); render();
+  });
+  root.querySelectorAll('[data-del-event]').forEach(el=>el.addEventListener('click', async ()=>{
+    state.data.agenda.events = state.data.agenda.events.filter(ev=>ev.id!==el.dataset.delEvent);
+    await saveKey('agenda'); render();
+  }));
+  root.querySelectorAll('[data-agenda-view]').forEach(el=>el.addEventListener('click', ()=>{
+    state.agendaView = el.dataset.agendaView; render();
+  }));
+  root.querySelectorAll('[data-cal-nav]').forEach(el=>el.addEventListener('click', ()=>{
+    const delta = parseInt(el.dataset.calNav);
+    let m = state.calMonth + delta, y = state.calYear;
+    if(m<0){ m=11; y--; } if(m>11){ m=0; y++; }
+    state.calMonth=m; state.calYear=y; render();
+  }));
+  const calTodayBtn = root.querySelector('[data-cal-today]');
+  if(calTodayBtn) calTodayBtn.addEventListener('click', ()=>{
+    const n = new Date();
+    state.calYear=n.getFullYear(); state.calMonth=n.getMonth(); state.selectedDate=todayISO(); render();
+  });
+  root.querySelectorAll('[data-cal-day]').forEach(el=>el.addEventListener('click', ()=>{
+    state.selectedDate = state.selectedDate===el.dataset.calDay ? null : el.dataset.calDay;
+    render();
+  }));
+
+  // recados
+  const addMsgForm = root.querySelector('[data-form="add-message"]');
+  if(addMsgForm) addMsgForm.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    state.data.messages.messages.push({id:uid(), text:fd.get('text'), priority:fd.get('priority'), author:fd.get('author'), done:false, date:todayISO()});
+    await saveKey('messages'); render();
+  });
+  root.querySelectorAll('[data-toggle-msg]').forEach(el=>el.addEventListener('click', async ()=>{
+    const m = state.data.messages.messages.find(m=>m.id===el.dataset.toggleMsg);
+    m.done = !m.done; await saveKey('messages'); render();
+  }));
+  root.querySelectorAll('[data-del-msg]').forEach(el=>el.addEventListener('click', async ()=>{
+    state.data.messages.messages = state.data.messages.messages.filter(m=>m.id!==el.dataset.delMsg);
+    await saveKey('messages'); render();
+  }));
+
+  // casa
+  const addTaskForm = root.querySelector('[data-form="add-task"]');
+  if(addTaskForm) addTaskForm.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    state.data.home.tasks.push({id:uid(), title:fd.get('title'), responsavel:fd.get('responsavel'), category:fd.get('category'), dueDate:fd.get('dueDate')||null, done:false});
+    await saveKey('home'); render();
+  });
+  root.querySelectorAll('[data-toggle-task]').forEach(el=>el.addEventListener('click', async ()=>{
+    const t = state.data.home.tasks.find(t=>t.id===el.dataset.toggleTask);
+    if(t){ t.done = !t.done; await saveKey('home'); render(); }
+  }));
+  root.querySelectorAll('[data-del-task]').forEach(el=>el.addEventListener('click', async ()=>{
+    state.data.home.tasks = state.data.home.tasks.filter(t=>t.id!==el.dataset.delTask);
+    await saveKey('home'); render();
+  }));
+
+  // contatos
+  const addContactForm = root.querySelector('[data-form="add-contact"]');
+  if(addContactForm) addContactForm.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    state.data.contacts.contacts.push({id:uid(), name:fd.get('name'), role:fd.get('role'), phone:fd.get('phone'), notes:fd.get('notes')});
+    await saveKey('contacts'); render();
+  });
+  root.querySelectorAll('[data-del-contact]').forEach(el=>el.addEventListener('click', async ()=>{
+    state.data.contacts.contacts = state.data.contacts.contacts.filter(c=>c.id!==el.dataset.delContact);
+    await saveKey('contacts'); render();
+  }));
+
+  // projetos
+  const addProjectForm = root.querySelector('[data-form="add-project"]');
+  if(addProjectForm) addProjectForm.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const name = new FormData(e.target).get('name').trim(); if(!name) return;
+    await createProject(name);
+  });
+  root.querySelectorAll('[data-quick-project]').forEach(el=>el.addEventListener('click', async ()=>{
+    await createProject(el.dataset.quickProject);
+  }));
+  root.querySelectorAll('[data-open-project]').forEach(el=>el.addEventListener('click', ()=>{
+    state.currentProject = el.dataset.openProject; render();
+  }));
+  const backBtn = root.querySelector('[data-back-projects]');
+  if(backBtn) backBtn.addEventListener('click', ()=>{ state.currentProject=null; render(); });
+
+  root.querySelectorAll('[data-change-status]').forEach(el=>el.addEventListener('change', async ()=>{
+    const p = state.data.projects.projects.find(p=>p.id===el.dataset.changeStatus);
+    p.status = el.value; logActivity(p, `Status alterado para ${PROJECT_STATUS[p.status]}`);
+    await saveKey('projects'); render();
+  }));
+  root.querySelectorAll('[data-change-priority]').forEach(el=>el.addEventListener('change', async ()=>{
+    const p = state.data.projects.projects.find(p=>p.id===el.dataset.changePriority);
+    p.priority = el.value; await saveKey('projects'); render();
+  }));
+  root.querySelectorAll('[data-project-name]').forEach(el=>el.addEventListener('change', async ()=>{
+    const p = state.data.projects.projects.find(p=>p.id===el.dataset.projectName);
+    const val = el.value.trim(); if(!val) { el.value = p.name; return; }
+    p.name = val; await saveKey('projects'); render();
+  }));
+  root.querySelectorAll('[data-budget-goal]').forEach(el=>el.addEventListener('change', async ()=>{
+    const p = state.data.projects.projects.find(p=>p.id===el.dataset.budgetGoal);
+    const val = parseFloat(el.value);
+    p.budgetGoal = (isNaN(val)||val<0) ? null : val;
+    await saveKey('projects'); render();
+  }));
+  root.querySelectorAll('[data-deadline-goal]').forEach(el=>el.addEventListener('change', async ()=>{
+    const p = state.data.projects.projects.find(p=>p.id===el.dataset.deadlineGoal);
+    p.deadlineGoal = el.value || null;
+    await saveKey('projects'); render();
+  }));
+  root.querySelectorAll('[data-objective]').forEach(el=>el.addEventListener('change', async ()=>{
+    const p = state.data.projects.projects.find(p=>p.id===el.dataset.objective);
+    p.objective = el.value; await saveKey('projects');
+  }));
+  root.querySelectorAll('[data-notes]').forEach(el=>el.addEventListener('change', async ()=>{
+    const p = state.data.projects.projects.find(p=>p.id===el.dataset.notes);
+    p.notes = el.value; await saveKey('projects');
+  }));
+  const addChecklistForm = root.querySelector('[data-form="add-checklist"]');
+  if(addChecklistForm) addChecklistForm.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const p = state.data.projects.projects.find(p=>p.id===e.target.dataset.pid);
+    const fd = new FormData(e.target);
+    const text = fd.get('text').trim(); if(!text) return;
+    const valRaw = parseFloat(fd.get('value'));
+    p.checklist.push({id:uid(), text, done:false, value:(isNaN(valRaw)?null:valRaw), startDate:fd.get('startDate')||null, endDate:fd.get('endDate')||null});
+    autoUpdateStatus(p);
+    await saveKey('projects'); render();
+  });
+  root.querySelectorAll('[data-toggle-checklist]').forEach(el=>el.addEventListener('click', async ()=>{
+    const [pid,cid] = el.dataset.toggleChecklist.split(':');
+    const p = state.data.projects.projects.find(p=>p.id===pid);
+    const c = p.checklist.find(c=>c.id===cid);
+    c.done = !c.done;
+    if(c.done) logActivity(p, `Concluído: ${c.text}`);
+    autoUpdateStatus(p);
+    await saveKey('projects'); render();
+  }));
+  root.querySelectorAll('[data-checklist-value]').forEach(el=>el.addEventListener('change', async ()=>{
+    const [pid,cid] = el.dataset.checklistValue.split(':');
+    const p = state.data.projects.projects.find(p=>p.id===pid);
+    const c = p.checklist.find(c=>c.id===cid);
+    const val = parseFloat(el.value);
+    c.value = (isNaN(val)||val<0) ? null : val;
+    await saveKey('projects'); render();
+  }));
+  root.querySelectorAll('[data-checklist-start]').forEach(el=>el.addEventListener('change', async ()=>{
+    const [pid,cid] = el.dataset.checklistStart.split(':');
+    const p = state.data.projects.projects.find(p=>p.id===pid);
+    const c = p.checklist.find(c=>c.id===cid);
+    c.startDate = el.value || null;
+    await saveKey('projects'); render();
+  }));
+  root.querySelectorAll('[data-checklist-end]').forEach(el=>el.addEventListener('change', async ()=>{
+    const [pid,cid] = el.dataset.checklistEnd.split(':');
+    const p = state.data.projects.projects.find(p=>p.id===pid);
+    const c = p.checklist.find(c=>c.id===cid);
+    c.endDate = el.value || null;
+    await saveKey('projects'); render();
+  }));
+  root.querySelectorAll('[data-del-checklist]').forEach(el=>el.addEventListener('click', async ()=>{
+    const [pid,cid] = el.dataset.delChecklist.split(':');
+    const p = state.data.projects.projects.find(p=>p.id===pid);
+    p.checklist = p.checklist.filter(c=>c.id!==cid);
+    autoUpdateStatus(p);
+    await saveKey('projects'); render();
+  }));
+  root.querySelectorAll('[data-proj-cal-nav]').forEach(el=>el.addEventListener('click', ()=>{
+    const delta = parseInt(el.dataset.projCalNav);
+    let m = state.projCalMonth + delta, y = state.projCalYear;
+    if(m<0){ m=11; y--; } if(m>11){ m=0; y++; }
+    state.projCalMonth=m; state.projCalYear=y; render();
+  }));
+  const addMilestoneForm = root.querySelector('[data-form="add-milestone"]');
+  if(addMilestoneForm) addMilestoneForm.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const p = state.data.projects.projects.find(p=>p.id===e.target.dataset.pid);
+    const fd = new FormData(e.target);
+    p.timeline.push({id:uid(), label:fd.get('label'), date:fd.get('date')});
+    await saveKey('projects'); render();
+  });
+  root.querySelectorAll('[data-del-milestone]').forEach(el=>el.addEventListener('click', async ()=>{
+    const [pid,tid] = el.dataset.delMilestone.split(':');
+    const p = state.data.projects.projects.find(p=>p.id===pid);
+    p.timeline = p.timeline.filter(t=>t.id!==tid);
+    await saveKey('projects'); render();
+  }));
+  root.querySelectorAll('[data-del-project]').forEach(el=>el.addEventListener('click', async ()=>{
+    if(!confirm('Excluir este projeto? Essa ação não pode ser desfeita.')) return;
+    state.data.projects.projects = state.data.projects.projects.filter(p=>p.id!==el.dataset.delProject);
+    state.currentProject = null;
+    await saveKey('projects'); render();
+  }));
+}
+async function createProject(name){
+  state.data.projects.projects.push({
+    id:uid(), name, status:'ideia', priority:'media', objective:'', checklist:[], timeline:[], activities:[], notes:'',
+    budgetGoal:null, deadlineGoal:null
+  });
+  await saveKey('projects'); render();
+}
+
+bootAuth();
+</script>
+</body>
+</html>
